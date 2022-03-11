@@ -28,12 +28,12 @@ workflow GATK_ALIGN_AND_PREPROCESS {
     main:
     ch_versions = Channel.empty()
 
-    ch_input = channel.from(input).map {
+    ch_input = input.map {
         meta, reads, intervals ->
         [meta, reads]
     }
 
-    ch_intervals = channel.from(input).map {
+    ch_intervals = input.map {
         meta, reads, intervals ->
         [meta, intervals]
     }

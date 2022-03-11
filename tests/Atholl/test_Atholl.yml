@@ -45,3 +45,186 @@
     # gatk4 applybqsr
     - path: output/gatk4/test.recalibrated.bam
       md5sum: 0d5af33c6c3866922c0e3f18cbd98083
+
+- name: atholl_create_somatic_pon
+  command: nextflow run ./tests/Atholl/test_Atholl.nf -entry test_create_somatic_pon -c ./tests/config/nextflow.config -c ./tests/Atholl/nextflow.config
+  tags:
+    - subworkflows
+    # - subworkflows/gatk_create_somatic_pon
+    # - gatk4
+    # Modules
+    # - gatk4/genomicsdbimport
+    # - gatk4/createsomaticpanelofnormals
+  files:
+      # gatk4 mutect2
+    - path: output/gatk4/test1.vcf.gz
+    - path: output/gatk4/test1.vcf.gz.stats
+      md5sum: b569ce66bbffe9588b3d221e821023ee
+    - path: output/gatk4/test1.vcf.gz.tbi
+    - path: output/gatk4/test2.vcf.gz
+    - path: output/gatk4/test2.vcf.gz.stats
+      md5sum: 76f749c53212d72e98801f6030fbf8a6
+    - path: output/gatk4/test2.vcf.gz.tbi
+      # gatk4 genomicsdbimport
+    - path: output/gatk4/test_panel/__tiledb_workspace.tdb
+      md5sum: d41d8cd98f00b204e9800998ecf8427e
+    - path: output/gatk4/test_panel/callset.json
+      md5sum: 112a106e92e7fdb15bce50b7a1bb6edf
+    - path: output/gatk4/test_panel/chr21$1$46709983/.__consolidation_lock
+      md5sum: d41d8cd98f00b204e9800998ecf8427e
+    - path: output/gatk4/test_panel/chr21$1$46709983/__array_schema.tdb
+    - path: output/gatk4/test_panel/chr21$1$46709983/genomicsdb_meta_dir/genomicsdb_column_bounds.json
+      md5sum: 87d3eec481b97747800ba95d4005bd8e
+    - path: output/gatk4/test_panel/vcfheader.vcf
+      contains:
+        - "FORMAT=<ID=AD,Number=R,Type=Integer,Description="
+    - path: output/gatk4/test_panel/vidmap.json
+      md5sum: fed3b534371db46a6da84901ad01be79
+      # gatk4 createsomaticpanelofnormals
+    - path: output/gatk4/test_panel.vcf.gz
+    - path: output/gatk4/test_panel.vcf.gz.tbi
+
+- name: test_tumor_only_somatic
+  command: nextflow run ./tests/Atholl/test_Atholl.nf -entry test_tumor_only_somatic -c tests/config/nextflow.config -c ./tests/Atholl/nextflow_somatic.config
+  tags:
+    - subworkflows
+    - subworkflows/gatk_tumor_only_somatic_variant_calling
+    - gatk_tumor_only_somatic_variant_calling
+    # Modules
+    - gatk4/mutect2
+    - gatk4/getpileupsummaries
+    - gatk4/calculatecontamination
+    - gatk4/filtermutectcalls
+  files:
+      # gatk4 mutect2
+    - path: ./output/gatk4/test.vcf.gz
+    - path: ./output/gatk4/test.vcf.gz.stats
+      md5sum: 55ed641e16089afb33cdbc478e202d3d
+    - path: ./output/gatk4/test.vcf.gz.tbi
+      # gatk4 getpileupsummaries
+    - path: ./output/gatk4/test.pileups.table
+      md5sum: fe35b6bc041f2df8bd1f23420af3ddf9
+      # gatk4 calculatecontamination
+    - path: ./output/gatk4/test.contamination.table
+      md5sum: 46c708c943b453da89a3da08acfdb2a7
+    - path: ./output/gatk4/test.segmentation.table
+      md5sum: f4643d9319bde4efbfbe516d6fb13052
+      # gatk4 filtermutectcalls
+    - path: ./output/gatk4/test_filtered.vcf.gz
+    - path: ./output/gatk4/test_filtered.vcf.gz.filteringStats.tsv
+      md5sum: 20985fe2afc1f464a6a7637417957441
+    - path: ./output/gatk4/test_filtered.vcf.gz.tbi
+
+- name: test_tumor_normal_somatic
+  command: nextflow run ./tests/Atholl/test_Atholl.nf -entry test_tumor_normal_somatic -c ./tests/config/nextflow.config -c ./tests/Atholl/nextflow_somatic.config
+  tags:
+    - subworkflows
+    - subworkflows/gatk_tumor_normal_somatic_variant_calling
+    - gatk_tumor_normal_somatic_variant_calling
+    # Modules
+    - gatk4/mutect2
+    - gatk4/learnreadorientationmodel
+    - gatk4/getpileupsummaries
+    - gatk4/calculatecontamination
+    - gatk4/filtermutectcalls
+  files:
+      # gatk4 mutect2
+    - path: ./output/gatk4/test.vcf.gz
+    - path: ./output/gatk4/test.vcf.gz.stats
+      md5sum: 17d2091015d04cbd4a26b7a67dc659e6
+    - path: ./output/gatk4/test.vcf.gz.tbi
+    - path: ./output/gatk4/test.f1r2.tar.gz
+      # gatk4 learnreadorientationmodel
+    - path: ./output/gatk4/test.tar.gz
+      # gatk4 getpileupsummaries
+    - path: ./output/gatk4/test_tumor.pileups.table
+      md5sum: fe35b6bc041f2df8bd1f23420af3ddf9
+    - path: ./output/gatk4/test_normal.pileups.table
+      md5sum: 8e0ca6f66e112bd2f7ec1d31a2d62469
+      # gatk4 calculatecontamination
+    - path: ./output/gatk4/test.contamination.table
+      md5sum: 46c708c943b453da89a3da08acfdb2a7
+    - path: ./output/gatk4/test.segmentation.table
+      md5sum: f4643d9319bde4efbfbe516d6fb13052
+      # gatk4 filtermutectcalls
+    - path: ./output/gatk4/test_filtered.vcf.gz
+    - path: ./output/gatk4/test_filtered.vcf.gz.filteringStats.tsv
+      md5sum: 9ae27fbd04af1a2ea574e2ff1c3a683b
+    - path: ./output/gatk4/test_filtered.vcf.gz.tbi
+
+- name: test_joint_skip_haplotc
+  command: nextflow run ./tests/Atholl/test_Atholl.nf -entry test_joint_skip_haplotc -c ./tests/config/nextflow.config -c ./tests/Atholl/nextflow_somatic.config
+  tags:
+    - subworkflows
+    - subworkflows/gatk_joint_germline_variant_calling
+    - gatk4
+    # Modules
+    - gatk4/haplotypecaller
+    - gatk4/genomicsdbimport
+    - gatk4/genotypegvcfs
+    - gatk4/variantrecalibrator
+    - gatk4/applyvqsr
+  files:
+      # gatk4 genomicsdbimport
+    - path: output/gatk4/test_joint/__tiledb_workspace.tdb
+      md5sum: d41d8cd98f00b204e9800998ecf8427e
+    - path: output/gatk4/test_joint/callset.json
+      md5sum: 50d456f0e8c6a89d05425caf34c05562
+    - path: output/gatk4/test_joint/chr21$1$46709983/.__consolidation_lock
+      md5sum: d41d8cd98f00b204e9800998ecf8427e
+    - path: output/gatk4/test_joint/chr21$1$46709983/__array_schema.tdb
+    - path: output/gatk4/test_joint/chr21$1$46709983/genomicsdb_meta_dir/genomicsdb_column_bounds.json
+      md5sum: 87d3eec481b97747800ba95d4005bd8e
+    - path: output/gatk4/test_joint/vcfheader.vcf
+      contains:
+        - "FORMAT=<ID=AD,Number=R,Type=Integer,Description="
+    - path: output/gatk4/test_joint/vidmap.json
+      # gatk4 genotypegvcfs
+    - path: ./output/gatk4/test_joint.vcf.gz
+    - path: ./output/gatk4/test_joint.vcf.gz.tbi
+      # gatk4 variantrecalibrator
+    - path: ./output/gatk4/test_joint.recal
+      contains:
+        - "#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO"
+    - path: ./output/gatk4/test_joint.recal.idx
+    - path: ./output/gatk4/test_joint.tranches
+      md5sum: b71bbfad2ed6bff6a26b0cc264d1707d
+      # gatk4/applyvqsr
+    - path: ./output/gatk4/test_joint_recalibrated.vcf.gz
+    - path: ./output/gatk4/test_joint_recalibrated.vcf.gz.tbi
+
+- name: test_joint_skip_vqsr
+  command: nextflow run ./tests/Atholl/test_Atholl.nf -entry test_joint_skip_vqsr -c ./tests/config/nextflow.config -c ./tests/Atholl/nextflow_somatic.config
+  tags:
+    - subworkflows
+    - subworkflows/gatk_joint_germline_variant_calling
+    - gatk4
+    # Modules
+    - gatk4/haplotypecaller
+    - gatk4/genomicsdbimport
+    - gatk4/genotypegvcfs
+    - gatk4/variantrecalibrator
+    - gatk4/applyvqsr
+  files:
+      # gatk4 haplotypecaller
+    - path: ./output/gatk4/test.g.vcf.gz
+    - path: ./output/gatk4/test.g.vcf.gz.tbi
+    - path: ./output/gatk4/test2.g.vcf.gz
+    - path: ./output/gatk4/test2.g.vcf.gz.tbi
+      # gatk4 genomicsdbimport
+    - path: output/gatk4/test_joint/__tiledb_workspace.tdb
+      md5sum: d41d8cd98f00b204e9800998ecf8427e
+    - path: output/gatk4/test_joint/callset.json
+      md5sum: 2ab411773b7267de61f8c04939de2a99
+    - path: output/gatk4/test_joint/chr22$1$40001/.__consolidation_lock
+      md5sum: d41d8cd98f00b204e9800998ecf8427e
+    - path: output/gatk4/test_joint/chr22$1$40001/__array_schema.tdb
+    - path: output/gatk4/test_joint/chr22$1$40001/genomicsdb_meta_dir/genomicsdb_column_bounds.json
+      md5sum: 2502f79658bc000578ebcfddfc1194c0
+    - path: output/gatk4/test_joint/vcfheader.vcf
+      contains:
+        - "FORMAT=<ID=AD,Number=R,Type=Integer,Description="
+    - path: output/gatk4/test_joint/vidmap.json
+      # gatk4 genotypegvcfs
+    - path: ./output/gatk4/test_joint.vcf.gz
+    - path: ./output/gatk4/test_joint.vcf.gz.tbi

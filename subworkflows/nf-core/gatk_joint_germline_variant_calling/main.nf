@@ -32,7 +32,7 @@ workflow GATK_JOINT_GERMLINE_VARIANT_CALLING {
 
     // haplotypecaller can be skipped if input samples are already in gvcf format, essentially making the subworkflow joint genotyping.
     if (run_haplotc) {
-        haplotc_input = channel.from(input)
+        haplotc_input = input
         //
         //Perform variant calling using haplotypecaller module. Additional argument "-ERC GVCF" used to run in gvcf mode.
         //
@@ -44,7 +44,7 @@ workflow GATK_JOINT_GERMLINE_VARIANT_CALLING {
 
     } else {
         // if haplotypecaller is skipped, this channels the input to genomicsdbimport instead of the output vcfs and tbis that normally come from haplotypecaller
-        direct_input = channel.from(input)
+        direct_input = input
         ch_vcf = direct_input.collect{it[1]}.toList()
         ch_index = direct_input.collect{it[2]}.toList()
     }

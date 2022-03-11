@@ -1,0 +1,2 @@
+SampleID,single_end,readgroup,input_file,paired_file_2,input_index,intervals,which_norm
+'test',false,'"@RG\\tID:Seq01p\\tSM:Seq01\\tPL:ILLUMINA"','/home/AD/gmackenz/Atholl/testing/This_one/test_align_reads/work/stage/32/6ed9d2a69872af6a3b29f9a2999b38/test.umi_1.fastq.gz','/home/AD/gmackenz/Atholl/testing/This_one/test_align_reads/work/stage/72/5b05a9723b6d7dcb0f4828280c991f/test.umi_1.fastq.gz',,'/home/AD/gmackenz/Atholl/testing/This_one/test_align_reads/work/stage/c9/e5c5dd49e0ebb1289fb592dfe95f40/genome.interval_list',

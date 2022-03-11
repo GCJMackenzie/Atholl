@@ -25,6 +25,7 @@ workflow ATHOLL {
     joint_germline
     tumor_somatic
     tumor_normal_somatic
+    paired
 
     //shared args: these args are used by two or more subworkflows, but are not universal, which subworkflows use them are noted.
     sites                 // channel: /path/to/known/sites/file       align and preprocess + joint germline
@@ -38,14 +39,14 @@ workflow ATHOLL {
     panel_of_normals      // channel: /path/to/panel/of/normals       tumor_only + tumor_normal
     panel_of_normals_tbi  // channel: /path/to/panel/of/normals/index tumor_only + tumor_normal
 
-    temp_intervals
-
     // aligner args: args exclusive to align and preprocess subworkflow
     bwaindex              // channel: /path/to/bwa/index/directory
     is_ubam               // channel: true/false whether input is in ubam format or not
     sort_order            // channel: which sort order to use for PICARD_SORTSAM_DUPLICATESMARKED
 
     // joint germline args: args exclusive to joint germline subworkflow
+    run_haplotc
+    run_vqsr
     allelespecific        // channel: true/false run allelespecific mode of vqsr modules
     resources             // channel: [[resource, vcfs, forvariantrecal], [resource, tbis, forvariantrecal], [resource, labels, forvariantrecal]]
     annotation            // channel: [annotations, to, use, for, variantrecal, filtering]
@@ -53,51 +54,67 @@ workflow ATHOLL {
     truthsensitivity      // channel: 0-100.0 truthsensitivity cutoff for applyvqsr
 
     main:
+    filetest = Channel.from(input).splitCsv(header: true).map{ row ->
+        metaid = "id:$row.SampleID"
+        if (alignment) {
+            metasingle = "single_end:$row.single_end"
+            metaread = "read_group:$row.readgroup"
+            if (paired) {
+                println("paired end data")
+                [[metaid, metasingle, metaread], [ row.input_file.toString(), row.paired_file_2.toString() ], row.input_index, row.intervals.toString(), row.which_norm ]
+            } else {
+                println("interleaved or ubam")
+                [[metaid, metasingle, metaread], row.input_file.toString(), row.input_index, row.intervals.toString(), row.which_norm ]
+            }
+        } else {
+            println("variant calling or pon")
+            [[metaid], row.input_file.toString(), row.input_index.toString(), row.intervals.toString(), row.which_norm ]
+        }
+    }.groupTuple()
 
     if (alignment) {
-        ch_align_in = Channel.from(input).map {
-            meta, reads, index, intervals, which_norm ->
-            [meta, reads, intervals]
-        }
+        ch_align_in = filetest.map {
+            meta, input_file, input_index, intervals_file, which_normal ->
+            if (paired) {
+                [meta, input_file[0], intervals_file]
+            } else {
+                [meta, input_file, intervals_file]
+            }
+        }.toList()
+        ch_align_in.view()
         println("The aligner is running")
         GATK_ALIGN_AND_PREPROCESS( ch_align_in , fasta , fai , dict , bwaindex , is_ubam , sort_order , sites , sites_index )
     }
 
     if (create_som_pon) {
-        ch_sompon_in = input
+        ch_sompon_in = filetest.toList()
         println("Panel of normals is being made")
-        GATK_CREATE_SOMATIC_PON(  ch_sompon_in , fasta , fai , dict , joint_id, joint_intervals )
+        ch_sompon_in.view()
+        // GATK_CREATE_SOMATIC_PON(  ch_sompon_in , fasta , fai , dict , joint_id, joint_intervals )
     }
 
     if (joint_germline) {
-        ch_joint_in = Channel.from(input).map {
+        ch_joint_in = filetest.map {
             meta, reads, index, intervals, which_norm ->
             [meta, reads, index, intervals]
-        }
+        }.toList()
         println("Performing joint germline variant calling")
         ch_joint_in.view()
-        println("GATK_JOINT_GERMLINE_VARIANT_CALLING(  $ch_joint_in , true , true , $fasta , $fai , $dict, $sites , $sites_index , $joint_id , $joint_intervals , $allelespecific , $resources , $annotation , $mode , false , $truthsensitivity )")
+        // GATK_JOINT_GERMLINE_VARIANT_CALLING(  ch_joint_in , run_haplotc , run_vqsr , fasta , fai , dict, sites , sites_index , joint_id , joint_intervals , allelespecific , resources , annotation , mode , false , truthsensitivity )
     }
 
     if (tumor_somatic) {
-        ch_tumor_in = Channel.from(input).map {
-            meta, reads, index, intervals, which_norm ->
-            [meta, reads, index, which_norm]
-        }
-        //intervals
+        ch_tumor_in = filetest.toList()
         println("Performing tumor-only somatic variant calling")
         ch_tumor_in.view()
-        println("GATK_TUMOR_ONLY_SOMATIC_VARIANT_CALLING(  $ch_tumor_in , $fasta , $fai , $dict , $germline_resource , $germline_resource_tbi , $panel_of_normals , $panel_of_normals_tbi , $temp_intervals )")
+        // GATK_TUMOR_ONLY_SOMATIC_VARIANT_CALLING(  ch_tumor_in , fasta , fai , dict , germline_resource , germline_resource_tbi , panel_of_normals , panel_of_normals_tbi )
     }
 
     if (tumor_normal_somatic) {
-        ch_tumor_normal_in = Channel.from(input).map {
-            meta, reads, index, intervals, which_norm ->
-            [meta, reads, index, which_norm]
-        }
+        ch_tumor_normal_in = filetest.toList()
         println("Performing tumor-normal somatic variant calling")
         ch_tumor_normal_in.view()
-        println("GATK_TUMOR_NORMAL_SOMATIC_VARIANT_CALLING(  $ch_tumor_normal_in , $fasta , $fai , $dict , $germline_resource , $germline_resource_tbi , $panel_of_normals , $panel_of_normals_tbi , $temp_intervals )")
+        // GATK_TUMOR_NORMAL_SOMATIC_VARIANT_CALLING(  ch_tumor_normal_in , fasta , fai , dict , germline_resource , germline_resource_tbi , panel_of_normals , panel_of_normals_tbi )
     }
 
 }
