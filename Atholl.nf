@@ -61,14 +61,14 @@ workflow ATHOLL {
             metaread = "read_group:$row.readgroup"
             if (paired) {
                 println("paired end data")
-                [[metaid, metasingle, metaread], [ row.input_file.toString(), row.paired_file_2.toString() ], row.input_index, row.intervals.toString(), row.which_norm ]
+                [[metaid, metasingle, metaread], [ file(row.input_file , checkIfExists : true), file(row.paired_file_2 , checkIfExists : true) ], row.input_index, file(row.intervals , checkIfExists : true), row.which_norm ]
             } else {
                 println("interleaved or ubam")
-                [[metaid, metasingle, metaread], row.input_file.toString(), row.input_index, row.intervals.toString(), row.which_norm ]
+                [[metaid, metasingle, metaread], file(row.input_file , checkIfExists : true), row.input_index, file(row.intervals , checkIfExists : true), row.which_norm ]
             }
         } else {
             println("variant calling or pon")
-            [[metaid], row.input_file.toString(), row.input_index.toString(), row.intervals.toString(), row.which_norm ]
+            [[metaid], file(row.input_file , checkIfExists : true), file(row.input_index , checkIfExists : true), file(row.intervals , checkIfExists : true), row.which_norm ]
         }
     }.groupTuple()
 
@@ -80,7 +80,7 @@ workflow ATHOLL {
             } else {
                 [meta, input_file, intervals_file]
             }
-        }.toList()
+        }.collect()
         ch_align_in.view()
         println("The aligner is running")
         GATK_ALIGN_AND_PREPROCESS( ch_align_in , fasta , fai , dict , bwaindex , is_ubam , sort_order , sites , sites_index )
@@ -111,10 +111,14 @@ workflow ATHOLL {
     }
 
     if (tumor_normal_somatic) {
-        ch_tumor_normal_in = filetest.toList()
+        ch_tumor_normal_in = filetest.map{ meta, input_file, input_index, intervals_file, which_normal ->
+            filtered_normal = which_normal.unique().toList()
+            [meta, input_file, input_index, intervals_file, filtered_normal]
+
+        }.collect()
         println("Performing tumor-normal somatic variant calling")
         ch_tumor_normal_in.view()
-        // GATK_TUMOR_NORMAL_SOMATIC_VARIANT_CALLING(  ch_tumor_normal_in , fasta , fai , dict , germline_resource , germline_resource_tbi , panel_of_normals , panel_of_normals_tbi )
+        GATK_TUMOR_NORMAL_SOMATIC_VARIANT_CALLING(  ch_tumor_normal_in , fasta , fai , dict , germline_resource , germline_resource_tbi , panel_of_normals , panel_of_normals_tbi )
     }
 
 }

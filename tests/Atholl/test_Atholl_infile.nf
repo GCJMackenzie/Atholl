@@ -13,12 +13,12 @@ workflow test_file_in {
     fai                   = file(params.test_data['homo_sapiens']['genome']['genome_fasta_fai'], checkIfExists: true)
     dict                  = file(params.test_data['homo_sapiens']['genome']['genome_dict'], checkIfExists: true)
 
-    alignment             = true
+    alignment             = false
     create_som_pon        = false
     joint_germline        = false
     tumor_somatic         = false
-    tumor_normal_somatic  = false
-    paired                = true
+    tumor_normal_somatic  = true
+    paired                = false
 
     sites                 = file(params.test_data['homo_sapiens']['genome']['dbsnp_146_hg38_vcf_gz'], checkIfExists: true)
     sites_index           = file(params.test_data['homo_sapiens']['genome']['dbsnp_146_hg38_vcf_gz_tbi'], checkIfExists: true)
@@ -31,8 +31,8 @@ workflow test_file_in {
     panel_of_normals      = []
     panel_of_normals_tbi  = []
 
-    BWAMEM2_INDEX( fasta )
-    bwaindex              = BWAMEM2_INDEX.out.index
+    // BWAMEM2_INDEX( fasta )
+    bwaindex              = []
     is_ubam               = false
     sort_order            = "coordinate"
 
