@@ -7,14 +7,7 @@ include { ATHOLL        } from '../../Atholl'
 
 workflow test_align_reads {
 
-    input                 = [
-                              [[ id:'test', single_end:false, read_group:'"@RG\\tID:Seq01p\\tSM:Seq01\\tPL:ILLUMINA"' ], // meta map
-                              [file(params.test_data['homo_sapiens']['illumina']['test_umi_1_fastq_gz'], checkIfExists: true),
-                               file(params.test_data['homo_sapiens']['illumina']['test_umi_2_fastq_gz'], checkIfExists: true)],
-                              [],
-                              [file(params.test_data['homo_sapiens']['genome']['genome_interval_list'], checkIfExists: true)],
-                              [] ]
-                            ]
+    input                 = file('/home/AD/gmackenz/Atholl/Atholl/tests/Atholl/test_align_infile.csv', checkIfExists : true)
 
     fasta                 = file(params.test_data['homo_sapiens']['genome']['genome_fasta'], checkIfExists: true)
     fai                   = file(params.test_data['homo_sapiens']['genome']['genome_fasta_fai'], checkIfExists: true)
@@ -25,6 +18,7 @@ workflow test_align_reads {
     joint_germline        = false
     tumor_somatic         = false
     tumor_normal_somatic  = false
+    paired                = true
 
     sites                 = file(params.test_data['homo_sapiens']['genome']['dbsnp_146_hg38_vcf_gz'], checkIfExists: true)
     sites_index           = file(params.test_data['homo_sapiens']['genome']['dbsnp_146_hg38_vcf_gz_tbi'], checkIfExists: true)
@@ -50,22 +44,11 @@ workflow test_align_reads {
     mode                  = []
     truthsensitivity      = []
 
-    ATHOLL ( input, fasta, fai, dict, alignment, create_som_pon, joint_germline, tumor_somatic, tumor_normal_somatic, sites, sites_index, joint_id, joint_intervals, germline_resource, germline_resource_tbi, panel_of_normals, panel_of_normals_tbi, bwaindex, is_ubam, sort_order, run_haplotc, run_vqsr, allelespecific, resources, annotation, mode, truthsensitivity )
+    ATHOLL ( input, fasta, fai, dict, alignment, create_som_pon, joint_germline, tumor_somatic, tumor_normal_somatic, paired, sites, sites_index, joint_id, joint_intervals, germline_resource, germline_resource_tbi, panel_of_normals, panel_of_normals_tbi, bwaindex, is_ubam, sort_order, run_haplotc, run_vqsr, allelespecific, resources, annotation, mode, truthsensitivity )
 }
 
 workflow test_create_somatic_pon {
-    input                 = [
-                              [[ id:'test1' ], // meta map
-                              [file(params.test_data['homo_sapiens']['illumina']['test_paired_end_recalibrated_sorted_bam'], checkIfExists: true)],
-                              [file(params.test_data['homo_sapiens']['illumina']['test_paired_end_recalibrated_sorted_bam_bai'], checkIfExists: true)],
-                              [],
-                              [] ],
-                              [[ id:'test2' ], // meta map
-                              [file(params.test_data['homo_sapiens']['illumina']['test2_paired_end_recalibrated_sorted_bam'], checkIfExists: true)],
-                              [file(params.test_data['homo_sapiens']['illumina']['test2_paired_end_recalibrated_sorted_bam_bai'], checkIfExists: true)],
-                              [],
-                              [] ]
-                            ]
+    input                 = file('/home/AD/gmackenz/Atholl/Atholl/tests/Atholl/test_sompon_infile.csv', checkIfExists : true)
 
     fasta                 = file(params.test_data['homo_sapiens']['genome']['genome_21_fasta'], checkIfExists: true)
     fai                   = file(params.test_data['homo_sapiens']['genome']['genome_21_fasta_fai'], checkIfExists: true)
@@ -76,6 +59,7 @@ workflow test_create_somatic_pon {
     joint_germline        = false
     tumor_somatic         = false
     tumor_normal_somatic  = false
+    paired                = false
 
     sites                 = []
     sites_index           = []
@@ -100,18 +84,11 @@ workflow test_create_somatic_pon {
     mode                  = []
     truthsensitivity      = []
 
-    ATHOLL ( input, fasta, fai, dict, alignment, create_som_pon, joint_germline, tumor_somatic, tumor_normal_somatic, sites, sites_index, joint_id, joint_intervals, germline_resource, germline_resource_tbi, panel_of_normals, panel_of_normals_tbi, bwaindex, is_ubam, sort_order, run_haplotc, run_vqsr, allelespecific, resources, annotation, mode, truthsensitivity )
+    ATHOLL ( input, fasta, fai, dict, alignment, create_som_pon, joint_germline, tumor_somatic, tumor_normal_somatic, paired, sites, sites_index, joint_id, joint_intervals, germline_resource, germline_resource_tbi, panel_of_normals, panel_of_normals_tbi, bwaindex, is_ubam, sort_order, run_haplotc, run_vqsr, allelespecific, resources, annotation, mode, truthsensitivity )
 }
 
 workflow test_tumor_only_somatic {
-input = [
-    [   [ id:'test' ], // meta map
-        [file(params.test_data['homo_sapiens']['illumina']['test2_paired_end_recalibrated_sorted_bam'], checkIfExists: true)],
-        [file(params.test_data['homo_sapiens']['illumina']['test2_paired_end_recalibrated_sorted_bam_bai'], checkIfExists: true)],
-        [file(params.test_data['homo_sapiens']['genome']['genome_21_interval_list'], checkIfExists: true)],
-        []
-    ]
-]
+    input                 = file('/home/AD/gmackenz/Atholl/Atholl/tests/Atholl/test_TO_infile.csv', checkIfExists : true)
 
     fasta                 = file(params.test_data['homo_sapiens']['genome']['genome_21_fasta'], checkIfExists: true)
     fai                   = file(params.test_data['homo_sapiens']['genome']['genome_21_fasta_fai'], checkIfExists: true)
@@ -122,6 +99,7 @@ input = [
     joint_germline        = false
     tumor_somatic         = true
     tumor_normal_somatic  = false
+    paired                = false
 
     sites                 = []
     sites_index           = []
@@ -146,19 +124,11 @@ input = [
     mode                  = []
     truthsensitivity      = []
 
-    ATHOLL ( input, fasta, fai, dict, alignment, create_som_pon, joint_germline, tumor_somatic, tumor_normal_somatic, sites, sites_index, joint_id, joint_intervals, germline_resource, germline_resource_tbi, panel_of_normals, panel_of_normals_tbi, bwaindex, is_ubam, sort_order, run_haplotc, run_vqsr, allelespecific, resources, annotation, mode, truthsensitivity )
+    ATHOLL ( input, fasta, fai, dict, alignment, create_som_pon, joint_germline, tumor_somatic, tumor_normal_somatic, paired, sites, sites_index, joint_id, joint_intervals, germline_resource, germline_resource_tbi, panel_of_normals, panel_of_normals_tbi, bwaindex, is_ubam, sort_order, run_haplotc, run_vqsr, allelespecific, resources, annotation, mode, truthsensitivity )
 }
 
 workflow test_tumor_normal_somatic {
-input = [
-    [
-        [ id:'test'], // meta map
-        [ file(params.test_data['homo_sapiens']['illumina']['test2_paired_end_recalibrated_sorted_bam'], checkIfExists: true) , file(params.test_data['homo_sapiens']['illumina']['test_paired_end_recalibrated_sorted_bam'], checkIfExists: true)],
-        [ file(params.test_data['homo_sapiens']['illumina']['test2_paired_end_recalibrated_sorted_bam_bai'], checkIfExists: true) , file(params.test_data['homo_sapiens']['illumina']['test_paired_end_recalibrated_sorted_bam_bai'], checkIfExists: true)],
-        [ file(params.test_data['homo_sapiens']['genome']['genome_21_interval_list'], checkIfExists: true) , file('/home/AD/gmackenz/Atholl/genome2.interval_list' , checkIfExists: true)],
-        ["normal"]
-    ]
-]
+    input                 = file('/home/AD/gmackenz/Atholl/Atholl/tests/Atholl/test_TN_infile.csv', checkIfExists : true)
     fasta                 = file(params.test_data['homo_sapiens']['genome']['genome_21_fasta'], checkIfExists: true)
     fai                   = file(params.test_data['homo_sapiens']['genome']['genome_21_fasta_fai'], checkIfExists: true)
     dict                  = file(params.test_data['homo_sapiens']['genome']['genome_21_dict'], checkIfExists: true)
@@ -168,6 +138,7 @@ input = [
     joint_germline        = false
     tumor_somatic         = false
     tumor_normal_somatic  = true
+    paired                = false
 
     sites                 = []
     sites_index           = []
@@ -192,26 +163,11 @@ input = [
     mode                  = []
     truthsensitivity      = []
 
-    ATHOLL ( input, fasta, fai, dict, alignment, create_som_pon, joint_germline, tumor_somatic, tumor_normal_somatic, sites, sites_index, joint_id, joint_intervals, germline_resource, germline_resource_tbi, panel_of_normals, panel_of_normals_tbi, bwaindex, is_ubam, sort_order, run_haplotc, run_vqsr, allelespecific, resources, annotation, mode, truthsensitivity )
+    ATHOLL ( input, fasta, fai, dict, alignment, create_som_pon, joint_germline, tumor_somatic, tumor_normal_somatic, paired, sites, sites_index, joint_id, joint_intervals, germline_resource, germline_resource_tbi, panel_of_normals, panel_of_normals_tbi, bwaindex, is_ubam, sort_order, run_haplotc, run_vqsr, allelespecific, resources, annotation, mode, truthsensitivity )
 }
 
 workflow test_joint_skip_haplotc {
-    input = [
-        [
-            [ id:'test' ], // meta map
-            file(params.test_data['homo_sapiens']['illumina']['test_g_vcf_gz'],  checkIfExists: true),
-            file(params.test_data['homo_sapiens']['illumina']['test_g_vcf_gz_tbi'],  checkIfExists: true),
-            file(params.test_data['homo_sapiens']['genome']['genome_21_interval_list'], checkIfExists: true),
-            []
-        ],
-        [
-            [ id:'test2' ], // meta map
-            file(params.test_data['homo_sapiens']['illumina']['test2_g_vcf_gz'], checkIfExists: true),
-            file(params.test_data['homo_sapiens']['illumina']['test2_g_vcf_gz_tbi'], checkIfExists: true),
-            file(params.test_data['homo_sapiens']['genome']['genome_21_interval_list'], checkIfExists: true),
-            []
-        ]
-    ]
+    input           = file('/home/AD/gmackenz/Atholl/Atholl/tests/Atholl/test_joint_germ_infile.csv', checkIfExists : true)
     fasta           = file(params.test_data['homo_sapiens']['genome']['genome_21_fasta'], checkIfExists: true)
     fai             = file(params.test_data['homo_sapiens']['genome']['genome_21_fasta_fai'], checkIfExists: true)
     dict            = file(params.test_data['homo_sapiens']['genome']['genome_21_dict'], checkIfExists: true)
@@ -221,6 +177,7 @@ workflow test_joint_skip_haplotc {
     joint_germline        = true
     tumor_somatic         = false
     tumor_normal_somatic  = false
+    paired                = false
 
     sites                 = file(params.test_data['homo_sapiens']['genome']['dbsnp_138_hg38_21_vcf_gz'], checkIfExists: true)
     sites_index           = file(params.test_data['homo_sapiens']['genome']['dbsnp_138_hg38_21_vcf_gz_tbi'], checkIfExists: true)
@@ -264,26 +221,11 @@ workflow test_joint_skip_haplotc {
     mode                  = 'SNP'
     truthsensitivity      = '99.0'
 
-    ATHOLL ( input, fasta, fai, dict, alignment, create_som_pon, joint_germline, tumor_somatic, tumor_normal_somatic, sites, sites_index, joint_id, joint_intervals, germline_resource, germline_resource_tbi, panel_of_normals, panel_of_normals_tbi, bwaindex, is_ubam, sort_order, run_haplotc, run_vqsr, allelespecific, resources, annotation, mode, truthsensitivity )
+    ATHOLL ( input, fasta, fai, dict, alignment, create_som_pon, joint_germline, tumor_somatic, tumor_normal_somatic, paired, sites, sites_index, joint_id, joint_intervals, germline_resource, germline_resource_tbi, panel_of_normals, panel_of_normals_tbi, bwaindex, is_ubam, sort_order, run_haplotc, run_vqsr, allelespecific, resources, annotation, mode, truthsensitivity )
 }
 
 workflow test_joint_skip_vqsr {
-    input = [
-        [
-            [ id:'test' ], // meta map
-            file(params.test_data['homo_sapiens']['illumina']['test_paired_end_sorted_bam'], checkIfExists: true),
-            file(params.test_data['homo_sapiens']['illumina']['test_paired_end_sorted_bam_bai'], checkIfExists: true),
-            file(params.test_data['homo_sapiens']['genome']['genome_bed'], checkIfExists: true),
-            []
-        ],
-        [
-            [ id:'test2' ], // meta map
-            file(params.test_data['homo_sapiens']['illumina']['test2_paired_end_sorted_bam'], checkIfExists: true),
-            file(params.test_data['homo_sapiens']['illumina']['test2_paired_end_sorted_bam_bai'], checkIfExists: true),
-            file(params.test_data['homo_sapiens']['genome']['genome_bed'], checkIfExists: true),
-            []
-        ]
-    ]
+    input            = file('/home/AD/gmackenz/Atholl/Atholl/tests/Atholl/test_joint_germ_bam_infile.csv', checkIfExists : true)
     fasta            = file(params.test_data['homo_sapiens']['genome']['genome_fasta'], checkIfExists: true)
     fai              = file(params.test_data['homo_sapiens']['genome']['genome_fasta_fai'], checkIfExists: true)
     dict             = file(params.test_data['homo_sapiens']['genome']['genome_dict'], checkIfExists: true)
@@ -293,6 +235,7 @@ workflow test_joint_skip_vqsr {
     joint_germline        = true
     tumor_somatic         = false
     tumor_normal_somatic  = false
+    paired                = false
 
     sites                 = file(params.test_data['homo_sapiens']['genome']['dbsnp_146_hg38_vcf_gz'], checkIfExists: true)
     sites_index           = file(params.test_data['homo_sapiens']['genome']['dbsnp_146_hg38_vcf_gz_tbi'], checkIfExists: true)
@@ -317,5 +260,5 @@ workflow test_joint_skip_vqsr {
     mode                  = []
     truthsensitivity      = []
 
-    ATHOLL ( input, fasta, fai, dict, alignment, create_som_pon, joint_germline, tumor_somatic, tumor_normal_somatic, sites, sites_index, joint_id, joint_intervals, germline_resource, germline_resource_tbi, panel_of_normals, panel_of_normals_tbi, bwaindex, is_ubam, sort_order, run_haplotc, run_vqsr, allelespecific, resources, annotation, mode, truthsensitivity )
+    ATHOLL ( input, fasta, fai, dict, alignment, create_som_pon, joint_germline, tumor_somatic, tumor_normal_somatic, paired, sites, sites_index, joint_id, joint_intervals, germline_resource, germline_resource_tbi, panel_of_normals, panel_of_normals_tbi, bwaindex, is_ubam, sort_order, run_haplotc, run_vqsr, allelespecific, resources, annotation, mode, truthsensitivity )
 }

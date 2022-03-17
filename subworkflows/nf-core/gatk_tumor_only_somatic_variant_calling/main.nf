@@ -21,7 +21,7 @@ workflow GATK_TUMOR_ONLY_SOMATIC_VARIANT_CALLING {
 
     main:
     ch_versions = Channel.empty()
-    mutect2_input = Channel.from(input)
+    mutect2_input = input
 
     //
     // Perform variant calling using mutect2 module in tumor single mode.
@@ -32,7 +32,7 @@ workflow GATK_TUMOR_ONLY_SOMATIC_VARIANT_CALLING {
     //
     // Generate pileup summary table using getepileupsummaries.
     //
-    pileup_input = Channel.from(input).map {
+    pileup_input = input.map {
         meta, input_file, input_index, intervals, which_norm ->
         [meta, input_file[0], input_index[0], intervals[0]]
     }

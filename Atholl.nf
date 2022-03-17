@@ -54,71 +54,77 @@ workflow ATHOLL {
     truthsensitivity      // channel: 0-100.0 truthsensitivity cutoff for applyvqsr
 
     main:
-    filetest = Channel.from(input).splitCsv(header: true).map{ row ->
-        metaid = "id:$row.SampleID"
-        if (alignment) {
-            metasingle = "single_end:$row.single_end"
-            metaread = "read_group:$row.readgroup"
-            if (paired) {
-                println("paired end data")
-                [[metaid, metasingle, metaread], [ file(row.input_file , checkIfExists : true), file(row.paired_file_2 , checkIfExists : true) ], row.input_index, file(row.intervals , checkIfExists : true), row.which_norm ]
-            } else {
-                println("interleaved or ubam")
-                [[metaid, metasingle, metaread], file(row.input_file , checkIfExists : true), row.input_index, file(row.intervals , checkIfExists : true), row.which_norm ]
-            }
-        } else {
-            println("variant calling or pon")
-            [[metaid], file(row.input_file , checkIfExists : true), file(row.input_index , checkIfExists : true), file(row.intervals , checkIfExists : true), row.which_norm ]
-        }
-    }.groupTuple()
+    filetest = extract_samples(input, alignment, paired, create_som_pon, joint_germline, tumor_somatic, tumor_normal_somatic)
+    println(filetest)
+    filetest.view()
 
     if (alignment) {
-        ch_align_in = filetest.map {
-            meta, input_file, input_index, intervals_file, which_normal ->
-            if (paired) {
-                [meta, input_file[0], intervals_file]
-            } else {
-                [meta, input_file, intervals_file]
-            }
-        }.collect()
-        ch_align_in.view()
         println("The aligner is running")
-        GATK_ALIGN_AND_PREPROCESS( ch_align_in , fasta , fai , dict , bwaindex , is_ubam , sort_order , sites , sites_index )
+        GATK_ALIGN_AND_PREPROCESS( filetest , fasta , fai , dict , bwaindex , is_ubam , sort_order , sites , sites_index )
     }
 
     if (create_som_pon) {
-        ch_sompon_in = filetest.toList()
-        println("Panel of normals is being made")
-        ch_sompon_in.view()
-        // GATK_CREATE_SOMATIC_PON(  ch_sompon_in , fasta , fai , dict , joint_id, joint_intervals )
+        GATK_CREATE_SOMATIC_PON(  filetest , fasta , fai , dict , joint_id, joint_intervals )
     }
 
     if (joint_germline) {
-        ch_joint_in = filetest.map {
-            meta, reads, index, intervals, which_norm ->
-            [meta, reads, index, intervals]
-        }.toList()
         println("Performing joint germline variant calling")
-        ch_joint_in.view()
-        // GATK_JOINT_GERMLINE_VARIANT_CALLING(  ch_joint_in , run_haplotc , run_vqsr , fasta , fai , dict, sites , sites_index , joint_id , joint_intervals , allelespecific , resources , annotation , mode , false , truthsensitivity )
+        GATK_JOINT_GERMLINE_VARIANT_CALLING(  filetest , run_haplotc , run_vqsr , fasta , fai , dict, sites , sites_index , joint_id , joint_intervals , allelespecific , resources , annotation , mode , false , truthsensitivity )
     }
 
     if (tumor_somatic) {
-        ch_tumor_in = filetest.toList()
         println("Performing tumor-only somatic variant calling")
-        ch_tumor_in.view()
-        // GATK_TUMOR_ONLY_SOMATIC_VARIANT_CALLING(  ch_tumor_in , fasta , fai , dict , germline_resource , germline_resource_tbi , panel_of_normals , panel_of_normals_tbi )
+        GATK_TUMOR_ONLY_SOMATIC_VARIANT_CALLING(  filetest , fasta , fai , dict , germline_resource , germline_resource_tbi , panel_of_normals , panel_of_normals_tbi )
     }
 
     if (tumor_normal_somatic) {
-        ch_tumor_normal_in = filetest.map{ meta, input_file, input_index, intervals_file, which_normal ->
-            filtered_normal = which_normal.unique().toList()
-            [meta, input_file, input_index, intervals_file, filtered_normal]
-
-        }.collect()
         println("Performing tumor-normal somatic variant calling")
-        ch_tumor_normal_in.view()
-        GATK_TUMOR_NORMAL_SOMATIC_VARIANT_CALLING(  ch_tumor_normal_in , fasta , fai , dict , germline_resource , germline_resource_tbi , panel_of_normals , panel_of_normals_tbi )
+        GATK_TUMOR_NORMAL_SOMATIC_VARIANT_CALLING(  filetest , fasta , fai , dict , germline_resource , germline_resource_tbi , panel_of_normals , panel_of_normals_tbi )
     }
 
+}
+
+def extract_samples(csv_file, alignment, paired, create_som_pon, joint_germline, tumor_somatic, tumor_normal_somatic) {
+    firststep = Channel.from(csv_file).splitCsv(header: true).map{ row ->
+        def meta = [:]
+        meta.id = row.SampleID
+        if (alignment) {
+            meta.single_end = "$row.single_end"
+            meta.read_group = "$row.readgroup"
+            if (paired) {
+                println("paired end data")
+                [meta, [ file(row.input_file , checkIfExists : true), file(row.paired_file_2 , checkIfExists : true) ], row.input_index, file(row.intervals , checkIfExists : true), row.which_norm ]
+
+            } else {
+                println("interleaved or ubam")
+                [meta, file(row.input_file , checkIfExists : true), row.input_index, file(row.intervals , checkIfExists : true), row.which_norm ]
+            }
+        } else if (create_som_pon) {
+            println("pon")
+            [meta, file(row.input_file , checkIfExists : true), file(row.input_index , checkIfExists : true), row.intervals, row.which_norm ]
+        } else {
+            println("variant calling")
+            [meta, file(row.input_file , checkIfExists : true), file(row.input_index , checkIfExists : true), file(row.intervals , checkIfExists : true), row.which_norm ]
+        }
+    }.groupTuple().map { meta, input_file, input_index, intervals_file, which_norm ->
+        def the_meta = meta
+        def input_files = input_file
+        def input_indexes = input_index
+        def intervals = intervals_file
+        def which_norms = which_norm
+        if (alignment){
+            if (paired) {
+                return [the_meta, input_files[0], intervals]
+            } else {
+                return [the_meta, input_files, intervals]
+            }
+        } else if (joint_germline) {
+            return [the_meta, input_files, input_indexes, intervals]
+        } else if (tumor_normal_somatic) {
+            filtered_normal = which_norms.unique().toList()
+            return [the_meta, input_files, input_indexes, intervals, filtered_normal]
+        } else {
+            return [the_meta, input_files, input_indexes, intervals, which_norms]
+        }
+    }
 }

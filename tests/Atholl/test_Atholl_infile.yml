@@ -1,5 +1,5 @@
 - name: test_file_in
-  command: nextflow run ./tests/Atholl/test_Atholl_infile.nf -entry test_file_in -c ./tests/config/nextflow.config -c ./tests/Atholl/nextflow.config
+  command: nextflow run ./tests/Atholl/test_Atholl_infile.nf -entry test_file_in -c ./tests/config/nextflow.config -c ./tests/Atholl/nextflow_somatic.config
   tags:
     - subworkflows
     - subworkflows/gatk_align_and_preprocess

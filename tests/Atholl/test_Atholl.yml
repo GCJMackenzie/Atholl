@@ -166,19 +166,19 @@
     - gatk4/applyvqsr
   files:
       # gatk4 genomicsdbimport
-    - path: output/gatk4/test_joint/__tiledb_workspace.tdb
+    - path: ./output/gatk4/test_joint/__tiledb_workspace.tdb
       md5sum: d41d8cd98f00b204e9800998ecf8427e
-    - path: output/gatk4/test_joint/callset.json
+    - path: ./output/gatk4/test_joint/callset.json
       md5sum: 50d456f0e8c6a89d05425caf34c05562
-    - path: output/gatk4/test_joint/chr21$1$46709983/.__consolidation_lock
+    - path: ./output/gatk4/test_joint/chr21$1$46709983/.__consolidation_lock
       md5sum: d41d8cd98f00b204e9800998ecf8427e
-    - path: output/gatk4/test_joint/chr21$1$46709983/__array_schema.tdb
-    - path: output/gatk4/test_joint/chr21$1$46709983/genomicsdb_meta_dir/genomicsdb_column_bounds.json
+    - path: ./output/gatk4/test_joint/chr21$1$46709983/__array_schema.tdb
+    - path: ./output/gatk4/test_joint/chr21$1$46709983/genomicsdb_meta_dir/genomicsdb_column_bounds.json
       md5sum: 87d3eec481b97747800ba95d4005bd8e
-    - path: output/gatk4/test_joint/vcfheader.vcf
+    - path: ./output/gatk4/test_joint/vcfheader.vcf
       contains:
         - "FORMAT=<ID=AD,Number=R,Type=Integer,Description="
-    - path: output/gatk4/test_joint/vidmap.json
+    - path: ./output/gatk4/test_joint/vidmap.json
       # gatk4 genotypegvcfs
     - path: ./output/gatk4/test_joint.vcf.gz
     - path: ./output/gatk4/test_joint.vcf.gz.tbi
@@ -212,19 +212,19 @@
     - path: ./output/gatk4/test2.g.vcf.gz
     - path: ./output/gatk4/test2.g.vcf.gz.tbi
       # gatk4 genomicsdbimport
-    - path: output/gatk4/test_joint/__tiledb_workspace.tdb
+    - path: ./output/gatk4/test_joint/__tiledb_workspace.tdb
       md5sum: d41d8cd98f00b204e9800998ecf8427e
-    - path: output/gatk4/test_joint/callset.json
+    - path: ./output/gatk4/test_joint/callset.json
       md5sum: 2ab411773b7267de61f8c04939de2a99
-    - path: output/gatk4/test_joint/chr22$1$40001/.__consolidation_lock
+    - path: ./output/gatk4/test_joint/chr22$1$40001/.__consolidation_lock
       md5sum: d41d8cd98f00b204e9800998ecf8427e
-    - path: output/gatk4/test_joint/chr22$1$40001/__array_schema.tdb
-    - path: output/gatk4/test_joint/chr22$1$40001/genomicsdb_meta_dir/genomicsdb_column_bounds.json
+    - path: ./output/gatk4/test_joint/chr22$1$40001/__array_schema.tdb
+    - path: ./output/gatk4/test_joint/chr22$1$40001/genomicsdb_meta_dir/genomicsdb_column_bounds.json
       md5sum: 2502f79658bc000578ebcfddfc1194c0
-    - path: output/gatk4/test_joint/vcfheader.vcf
+    - path: ./output/gatk4/test_joint/vcfheader.vcf
       contains:
         - "FORMAT=<ID=AD,Number=R,Type=Integer,Description="
-    - path: output/gatk4/test_joint/vidmap.json
+    - path: ./output/gatk4/test_joint/vidmap.json
       # gatk4 genotypegvcfs
     - path: ./output/gatk4/test_joint.vcf.gz
     - path: ./output/gatk4/test_joint.vcf.gz.tbi

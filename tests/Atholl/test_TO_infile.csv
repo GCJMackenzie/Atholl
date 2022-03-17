@@ -1,0 +1,2 @@
+SampleID,single_end,readgroup,input_file,paired_file_2,input_index,intervals,which_norm
+'test',,,https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/illumina/bam/test2.paired_end.recalibrated.sorted.bam,,https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/illumina/bam/test2.paired_end.recalibrated.sorted.bam.bai,https://raw.githubusercontent.com/nf-core/test-datasets/modules/data/genomics/homo_sapiens/genome/chr21/sequence/genome.interval_list,
