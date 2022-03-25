@@ -20,7 +20,7 @@ workflow GATK_CREATE_SOMATIC_PON {
     //
     //Perform variant calling for each sample using mutect2 module in panel of normals mode.
     //
-    input = Channel.from(ch_mutect2_in)
+    println(ch_mutect2_in)
     GATK4_MUTECT2 ( input, false, true, false, fasta, fai, dict, [], [], [], [] )
     ch_versions = ch_versions.mix(GATK4_MUTECT2.out.versions.first())
 

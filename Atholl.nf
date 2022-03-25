@@ -2,7 +2,9 @@
 
 nextflow.enable.dsl = 2
 
-include { GATK_ALIGN_AND_PREPROCESS } from './subworkflows/nf-core/gatk_align_and_preprocess/main'
+include { GATK_ALIGN } from './subworkflows/nf-core/gatk_align/main'
+include { SAMTOOLS_CHUNK } from './subworkflows/nf-core/samtools_chunking/main'
+include { GATK_PREPROCESS } from './subworkflows/nf-core/gatk_preprocess/main'
 include { GATK_CREATE_SOMATIC_PON } from './subworkflows/nf-core/gatk_create_somatic_pon/main'
 include { GATK_JOINT_GERMLINE_VARIANT_CALLING } from './subworkflows/nf-core/gatk_joint_germline_variant_calling/main'
 include { GATK_TUMOR_ONLY_SOMATIC_VARIANT_CALLING } from './subworkflows/nf-core/gatk_tumor_only_somatic_variant_calling/main'
@@ -54,32 +56,34 @@ workflow ATHOLL {
     truthsensitivity      // channel: 0-100.0 truthsensitivity cutoff for applyvqsr
 
     main:
-    filetest = extract_samples(input, alignment, paired, create_som_pon, joint_germline, tumor_somatic, tumor_normal_somatic)
-    println(filetest)
-    filetest.view()
+        filetest = extract_samples(input, alignment, paired, create_som_pon, joint_germline, tumor_somatic, tumor_normal_somatic)
 
     if (alignment) {
         println("The aligner is running")
-        GATK_ALIGN_AND_PREPROCESS( filetest , fasta , fai , dict , bwaindex , is_ubam , sort_order , sites , sites_index )
+        GATK_ALIGN( filetest , fasta , fai , dict , bwaindex , is_ubam , sort_order )
+        ch_preprocess_in = GATK_ALIGN.out.sortsam_out.combine(GATK_ALIGN.out.samtools_index_out, by: 0).combine(GATK_ALIGN.out.intervals_out, by: 0)
+        ch_preprocess_in.view()
+        SAMTOOLS_CHUNK(ch_preprocess_in, joint_intervals)
+        GATK_PREPROCESS( ch_preprocess_in , fasta , fai , dict , sort_order, sites, sites_index )
     }
 
     if (create_som_pon) {
-        GATK_CREATE_SOMATIC_PON(  filetest , fasta , fai , dict , joint_id, joint_intervals )
+        // GATK_CREATE_SOMATIC_PON(  filetest , fasta , fai , dict , joint_id, joint_intervals )
     }
 
     if (joint_germline) {
         println("Performing joint germline variant calling")
-        GATK_JOINT_GERMLINE_VARIANT_CALLING(  filetest , run_haplotc , run_vqsr , fasta , fai , dict, sites , sites_index , joint_id , joint_intervals , allelespecific , resources , annotation , mode , false , truthsensitivity )
+        // GATK_JOINT_GERMLINE_VARIANT_CALLING(  filetest , run_haplotc , run_vqsr , fasta , fai , dict, sites , sites_index , joint_id , joint_intervals , allelespecific , resources , annotation , mode , false , truthsensitivity )
     }
 
     if (tumor_somatic) {
         println("Performing tumor-only somatic variant calling")
-        GATK_TUMOR_ONLY_SOMATIC_VARIANT_CALLING(  filetest , fasta , fai , dict , germline_resource , germline_resource_tbi , panel_of_normals , panel_of_normals_tbi )
+        // GATK_TUMOR_ONLY_SOMATIC_VARIANT_CALLING(  filetest , fasta , fai , dict , germline_resource , germline_resource_tbi , panel_of_normals , panel_of_normals_tbi )
     }
 
     if (tumor_normal_somatic) {
         println("Performing tumor-normal somatic variant calling")
-        GATK_TUMOR_NORMAL_SOMATIC_VARIANT_CALLING(  filetest , fasta , fai , dict , germline_resource , germline_resource_tbi , panel_of_normals , panel_of_normals_tbi )
+        // GATK_TUMOR_NORMAL_SOMATIC_VARIANT_CALLING(  filetest , fasta , fai , dict , germline_resource , germline_resource_tbi , panel_of_normals , panel_of_normals_tbi )
     }
 
 }

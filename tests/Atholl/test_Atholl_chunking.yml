@@ -1,0 +1,126 @@
+- name: test_fastq_to_recalbam
+  command: nextflow run ./tests/Atholl/test_Atholl_chunking.nf -entry test_fastq_to_recalbam -c ./tests/config/nextflow.config -c ./tests/Atholl/nextflow_align.config
+  tags:
+    - subworkflows
+    - subworkflows/gatk_align_and_preprocess
+    - gatk4
+    # Modules
+    - bwamem2 index
+    - bwamem2 mem
+    - gatk4 applybqsr
+    - gatk4 BaseRecalibrator
+    - picard markduplicates
+    - picard sortsam
+    - samtools index
+  files:
+    # bwamem2 index
+    - path: ./output/bwamem2/bwamem2/genome.fasta.amb
+      md5sum: 1891c1de381b3a96d4e72f590fde20c1
+    - path: ./output/bwamem2/bwamem2/genome.fasta.pac
+      md5sum: 8569fbdb2c98c6fb16dfa73d8eacb070
+    - path: ./output/bwamem2/bwamem2/genome.fasta.0123
+      md5sum: d73300d44f733bcdb7c988fc3ff3e3e9
+    - path: ./output/bwamem2/bwamem2/genome.fasta.bwt.2bit.64
+      md5sum: cd4bdf496eab05228a50c45ee43c1ed0
+    - path: ./output/bwamem2/bwamem2/genome.fasta.ann
+      md5sum: 2df4aa2d7580639fa0fcdbcad5e2e969
+    # bwamem2 mem
+    - path: output/bwamem2/test.mapped.bam
+      md5sum: cec7a9970a4fb2538ea7eb3d96b29ba3
+    # picard sortsam aligned
+    - path: output/picard/test.sorted.bam
+      md5sum: 108e0b72bf4981645998df498854ac75
+    # samtools index
+    - path: output/samtools/test.sorted.bam.bai
+      md5sum: 244ea36279aa28a71a6cf4e96f539152
+    # picard markduplicates
+    - path: ./output/picard/test.markduplicates.MarkDuplicates.metrics.txt
+      contains:
+        - "BIN	CoverageMult	all_sets	non_optical_sets"
+    - path: ./output/picard/test.markduplicates.bam
+      md5sum: eeb17e0864cc135db202c555a6f24f00
+    # picard sortsam duplicatesmarked
+    - path: output/picard/test.duplicatesmarked.sorted.bam
+      md5sum: cd8c4bc072e0aedc8a8fab8d33b6f53b
+    # samtools index
+    - path: output/samtools/test.duplicatesmarked.sorted.bam.bai
+      md5sum: 0ddfb51805b24f41a097d025356c9f9b
+    # gatk4 BaseRecalibrator
+    - path: output/gatk4/test.table
+      md5sum: 215f157a1188fa61bbe2cdc595d07e29
+    # gatk4 applybqsr
+    - path: output/gatk4/test.recalibrated.bam
+      md5sum: 27d60620f5a342743ebcca81d239e1ae
+
+- name: test_fastq_to_recalbam_multi
+  command: nextflow run ./tests/Atholl/test_Atholl_chunking.nf -entry test_fastq_to_recalbam_multi -c ./tests/config/nextflow.config -c ./tests/Atholl/nextflow_align.config
+  tags:
+    - subworkflows
+    - subworkflows/gatk_align_and_preprocess
+    - gatk4
+    # Modules
+    - bwamem2 index
+    - bwamem2 mem
+    - gatk4 applybqsr
+    - gatk4 BaseRecalibrator
+    - picard markduplicates
+    - picard sortsam
+    - samtools index
+  files:
+    # bwamem2 index
+    - path: ./output/bwamem2/bwamem2/genome.fasta.amb
+      md5sum: 1891c1de381b3a96d4e72f590fde20c1
+    - path: ./output/bwamem2/bwamem2/genome.fasta.pac
+      md5sum: 8569fbdb2c98c6fb16dfa73d8eacb070
+    - path: ./output/bwamem2/bwamem2/genome.fasta.0123
+      md5sum: d73300d44f733bcdb7c988fc3ff3e3e9
+    - path: ./output/bwamem2/bwamem2/genome.fasta.bwt.2bit.64
+      md5sum: cd4bdf496eab05228a50c45ee43c1ed0
+    - path: ./output/bwamem2/bwamem2/genome.fasta.ann
+      md5sum: 2df4aa2d7580639fa0fcdbcad5e2e969
+    # bwamem2 mem
+    - path: output/bwamem2/test.mapped.bam
+      md5sum: cec7a9970a4fb2538ea7eb3d96b29ba3
+    - path: output/bwamem2/test2.mapped.bam
+      md5sum: bfb520c0cff66e9a578e293513dc2e9c
+    # picard sortsam aligned
+    - path: output/picard/test.sorted.bam
+      md5sum: 108e0b72bf4981645998df498854ac75
+    - path: output/picard/test2.sorted.bam
+      md5sum: 733eb19ef7236b0568f5a9c4bcb0a949
+    # samtools index
+    - path: output/samtools/test.sorted.bam.bai
+      md5sum: 244ea36279aa28a71a6cf4e96f539152
+    - path: output/samtools/test2.sorted.bam.bai
+      md5sum: 4d03a5f682757e79e8ef95f78629b6c6
+    # picard markduplicates
+    - path: ./output/picard/test.markduplicates.MarkDuplicates.metrics.txt
+      contains:
+        - "BIN	CoverageMult	all_sets	non_optical_sets"
+    - path: ./output/picard/test.markduplicates.bam
+      md5sum: eeb17e0864cc135db202c555a6f24f00
+    - path: ./output/picard/test2.markduplicates.MarkDuplicates.metrics.txt
+      contains:
+        - "BIN	CoverageMult	all_sets	non_optical_sets"
+    - path: ./output/picard/test2.markduplicates.bam
+      md5sum: 6a8e07ef2bea5ab6edefd95f4e3a8fe2
+    # picard sortsam duplicatesmarked
+    - path: output/picard/test.duplicatesmarked.sorted.bam
+      md5sum: cd8c4bc072e0aedc8a8fab8d33b6f53b
+    - path: output/picard/test2.duplicatesmarked.sorted.bam
+      md5sum: 6d4d202f8ddcfe2f1a07386a103978fb
+    # samtools index
+    - path: output/samtools/test.duplicatesmarked.sorted.bam.bai
+      md5sum: 0ddfb51805b24f41a097d025356c9f9b
+    - path: output/samtools/test2.duplicatesmarked.sorted.bam.bai
+      md5sum: 75216af111bf5edbd980ea64c52b1f2b
+    # gatk4 BaseRecalibrator
+    - path: output/gatk4/test.table
+      md5sum: 215f157a1188fa61bbe2cdc595d07e29
+    - path: output/gatk4/test2.table
+      md5sum: 215f157a1188fa61bbe2cdc595d07e29
+    # gatk4 applybqsr
+    - path: output/gatk4/test.recalibrated.bam
+      md5sum: 27d60620f5a342743ebcca81d239e1ae
+    - path: output/gatk4/test2.recalibrated.bam
+      md5sum: 22b694f9c2cae7d31e5035a5ef6dbfdf

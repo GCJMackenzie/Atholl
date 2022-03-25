@@ -42,7 +42,7 @@ workflow GATK_TUMOR_ONLY_SOMATIC_VARIANT_CALLING {
     //
     // Contamination and segmentation tables created using calculatecontamination on the pileup summary table.
     //
-    ch_pileup = GATK4_GETPILEUPSUMMARIES.out.table.collect()
+    ch_pileup = GATK4_GETPILEUPSUMMARIES.out.table
     //[] is a placeholder for the optional input where the matched normal sample would be passed in for tumor-normal samples, which is not necessary for this workflow.
     ch_pileup.add([])
     GATK4_CALCULATECONTAMINATION ( ch_pileup, true )
@@ -51,13 +51,13 @@ workflow GATK_TUMOR_ONLY_SOMATIC_VARIANT_CALLING {
     //
     // Mutect2 calls filtered by filtermutectcalls using the contamination and segmentation tables.
     //
-    ch_vcf   = GATK4_MUTECT2.out.vcf.collect()
-    ch_tbi   = GATK4_MUTECT2.out.tbi.collect()
-    ch_stats = GATK4_MUTECT2.out.stats.collect()
+    ch_vcf   = GATK4_MUTECT2.out.vcf
+    ch_tbi   = GATK4_MUTECT2.out.tbi
+    ch_stats = GATK4_MUTECT2.out.stats
     // [] is added as a placeholder for the optional input file artifact priors, which is only used for tumor-normal samples and therefor isn't needed in this workflow.
     ch_stats.add([])
-    ch_segment       = GATK4_CALCULATECONTAMINATION.out.segmentation.collect()
-    ch_contamination = GATK4_CALCULATECONTAMINATION.out.contamination.collect()
+    ch_segment       = GATK4_CALCULATECONTAMINATION.out.segmentation
+    ch_contamination = GATK4_CALCULATECONTAMINATION.out.contamination
     // [] is added as a placeholder for entering a contamination estimate value, which is not needed as this workflow uses the contamination table instead.
     ch_contamination.add([])
     ch_filtermutect_in = ch_vcf.combine(ch_tbi, by: 0).combine(ch_stats, by: 0).combine(ch_segment, by: 0).combine(ch_contamination, by: 0)
