@@ -61,10 +61,12 @@ workflow ATHOLL {
     if (alignment) {
         println("The aligner is running")
         GATK_ALIGN( filetest , fasta , fai , dict , bwaindex , is_ubam , sort_order )
-        ch_preprocess_in = GATK_ALIGN.out.sortsam_out.combine(GATK_ALIGN.out.samtools_index_out, by: 0).combine(GATK_ALIGN.out.intervals_out, by: 0)
-        ch_preprocess_in.view()
-        SAMTOOLS_CHUNK(ch_preprocess_in, joint_intervals)
-        GATK_PREPROCESS( ch_preprocess_in , fasta , fai , dict , sort_order, sites, sites_index )
+        ch_chunk_in = GATK_ALIGN.out.sortsam_out.combine(GATK_ALIGN.out.samtools_index_out, by: 0)
+        SAMTOOLS_CHUNK(ch_chunk_in, joint_intervals)
+        GATK_PREPROCESS( SAMTOOLS_CHUNK.out.ch_format_out , fasta , fai , dict , sort_order, sites, sites_index )
+        ch_final_map = GATK_PREPROCESS.out.baserecalibrator_out.combine(GATK_PREPROCESS.out.samtools_index_out, by: 0).combine(GATK_PREPROCESS.out.ch_intervals_out, by: 0)
+        ch_view_out = ch_final_map.groupTuple(by: 3)
+        ch_view_out.view()
     }
 
     if (create_som_pon) {

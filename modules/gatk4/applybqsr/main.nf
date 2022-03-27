@@ -8,7 +8,7 @@ process GATK4_APPLYBQSR {
         'quay.io/biocontainers/gatk4:4.2.4.1--hdfd78af_0' }"
 
     input:
-    tuple val(meta), path(input), path(input_index), path(bqsr_table), path(intervals)
+    tuple val(meta), path(input), path(input_index), path(bqsr_table), val(intervals)
     path  fasta
     path  fai
     path  dict

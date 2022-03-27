@@ -8,7 +8,7 @@ process SAMTOOLS_VIEW {
         'quay.io/biocontainers/samtools:1.14--hb421002_0' }"
 
     input:
-    tuple val(meta), path(input), path(index)
+    tuple val(meta), path(input), path(index), val(intervals)
     path fasta
 
     output:
@@ -33,6 +33,7 @@ process SAMTOOLS_VIEW {
         ${reference} \\
         $args \\
         $input \\
+        $intervals \\
         $args2 \\
         > ${prefix}.${file_type}
 

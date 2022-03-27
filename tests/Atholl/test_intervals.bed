@@ -1,4 +1,2 @@
-chr22	1	10000	seconds	249.0
-chr22	10001	20000	seconds	199.0
-chr22	20001	30000	seconds	199.0
-chr22	30001	40001	seconds	199.0
+chr22	1001	3000	seconds	249.0
+chr22	3001	5000	seconds	199.0

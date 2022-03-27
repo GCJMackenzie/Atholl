@@ -70,8 +70,8 @@ workflow GATK_PREPROCESS {
     //
     ch_baserecal_out = ch_baserecal_in.combine(ch_bqsrtable, by: 0)
     ch_bqsr_in = ch_baserecal_out.map {
-        meta, input, input_index, intervals, bqsrtable ->
-        [meta, input, input_index, bqsrtable, intervals]
+       meta, input, input_index, intervals, bqsrtable ->
+       [meta, input, input_index, bqsrtable, intervals]
     }
     GATK4_APPLYBQSR( ch_bqsr_in, fasta, fai, dict )
     ch_versions = ch_versions.mix(GATK4_APPLYBQSR.out.versions)
@@ -83,5 +83,6 @@ workflow GATK_PREPROCESS {
     samtools_index_out      = SAMTOOLS_INDEX_RECAL.out.bai                      // channel: [ val(meta), [ bai ] ]
     baserecalibrator_out    = GATK4_BASERECALIBRATOR.out.table                  // channel: [ val(meta), [ table ] ]
     applybqsr_out           = GATK4_APPLYBQSR.out.bam                           // channel: [ val(meta), [ bam ] ]
+    ch_intervals_out        = ch_intervals
     sortsam_dupesmarked_out = PICARD_SORTSAM_DUPLICATESMARKED.out.bam           // channel: [ val(meta), [ bam ] ]
 }
