@@ -5,6 +5,7 @@ nextflow.enable.dsl = 2
 include { GATK_ALIGN } from './subworkflows/nf-core/gatk_align/main'
 include { SAMTOOLS_CHUNK } from './subworkflows/nf-core/samtools_chunking/main'
 include { GATK_PREPROCESS } from './subworkflows/nf-core/gatk_preprocess/main'
+include { GATK_MUTECT2_CALLING } from './subworkflows/nf-core/gatk_mutect2_calling/main'
 include { GATK_CREATE_SOMATIC_PON } from './subworkflows/nf-core/gatk_create_somatic_pon/main'
 include { GATK_JOINT_GERMLINE_VARIANT_CALLING } from './subworkflows/nf-core/gatk_joint_germline_variant_calling/main'
 include { GATK_TUMOR_ONLY_SOMATIC_VARIANT_CALLING } from './subworkflows/nf-core/gatk_tumor_only_somatic_variant_calling/main'
@@ -64,28 +65,40 @@ workflow ATHOLL {
         ch_chunk_in = GATK_ALIGN.out.sortsam_out.combine(GATK_ALIGN.out.samtools_index_out, by: 0)
         SAMTOOLS_CHUNK(ch_chunk_in, joint_intervals)
         GATK_PREPROCESS( SAMTOOLS_CHUNK.out.ch_format_out , fasta , fai , dict , sort_order, sites, sites_index )
-        ch_final_map = GATK_PREPROCESS.out.baserecalibrator_out.combine(GATK_PREPROCESS.out.samtools_index_out, by: 0).combine(GATK_PREPROCESS.out.ch_intervals_out, by: 0)
-        ch_view_out = ch_final_map.groupTuple(by: 3)
-        ch_view_out.view()
     }
 
     if (create_som_pon) {
-        // GATK_CREATE_SOMATIC_PON(  filetest , fasta , fai , dict , joint_id, joint_intervals )
+        ch_mutect2_sub_in = GATK_PREPROCESS.out.applybqsr_out.combine(GATK_PREPROCESS.out.samtools_index_out, by: 0).combine(GATK_PREPROCESS.out.ch_intervals_out, by: 0).map{meta, bam, bai, intervals -> [meta, bam, bai, intervals, [] ]}
+        GATK_MUTECT2_CALLING(ch_mutect2_sub_in, false, false, true, fasta, fai, dict, germline_resource, germline_resource_tbi, panel_of_normals, panel_of_normals_tbi)
+        ch_som_pon_vcf =  GATK_MUTECT2_CALLING.out.mutect2_vcf.collect{it[1]}.toList()
+        ch__som_pon_index =  GATK_MUTECT2_CALLING.out.mutect2_tbi.collect{it[1]}.toList()
+        ch_som_pon_in = Channel.of([[ id:joint_id ]]).combine(ch_som_pon_vcf).combine(ch__som_pon_index).combine([joint_intervals]).combine(['']).combine([dict])
+        GATK_CREATE_SOMATIC_PON(  ch_som_pon_in , fasta , fai , dict , joint_id, joint_intervals )
     }
+
+    if (tumor_somatic) {
+        ch_mutect2_sub_in = GATK_PREPROCESS.out.applybqsr_out.combine(GATK_PREPROCESS.out.samtools_index_out, by: 0).combine(GATK_PREPROCESS.out.ch_intervals_out, by: 0).map{meta, bam, bai, intervals -> [meta, bam, bai, intervals, [] ]}
+        GATK_MUTECT2_CALLING(ch_mutect2_sub_in, false, true, false, fasta, fai, dict, germline_resource, germline_resource_tbi, panel_of_normals, panel_of_normals_tbi)
+        ch_tumor_only_in = GATK_PREPROCESS.out.applybqsr_out.combine(GATK_PREPROCESS.out.samtools_index_out, by: 0).combine(GATK_MUTECT2_CALLING.out.mutect2_vcf, by: 0).combine(GATK_MUTECT2_CALLING.out.mutect2_tbi, by: 0).combine(GATK_MUTECT2_CALLING.out.mutect2_stats, by: 0).combine(GATK_MUTECT2_CALLING.out.mutect2_intervals, by: 0)
+        println("Performing tumor-only somatic variant calling")
+        GATK_TUMOR_ONLY_SOMATIC_VARIANT_CALLING(  ch_tumor_only_in , fasta , fai , dict , germline_resource , germline_resource_tbi)
+    }
+
+    if (tumor_normal_somatic) {
+        if (alignment){ ch_mutect2_sub_in = GATK_PREPROCESS.out.applybqsr_out.combine(GATK_PREPROCESS.out.samtools_index_out, by: 0).combine(GATK_PREPROCESS.out.ch_intervals_out, by: 0)
+        .map{meta, bam, bai, intervals ->
+            [meta, meta.sample, bam, bai, intervals, meta.norms ]}.groupTuple(by:[1,4])
+        .map{meta, sample_id, bam, bai, intervals, which_norms ->
+            which_norm = which_norms.unique().toList()
+            [meta, sample_id, bam, bai, intervals, which_norm]
+            }
+        GATK_MUTECT2_CALLING(ch_mutect2_sub_in, true, false, false, fasta, fai, dict, germline_resource, germline_resource_tbi, panel_of_normals, panel_of_normals_tbi)
+        // GATK_TUMOR_NORMAL_SOMATIC_VARIANT_CALLING(  filetest , fasta , fai , dict , germline_resource , germline_resource_tbi , panel_of_normals , panel_of_normals_tbi )
+    }}
 
     if (joint_germline) {
         println("Performing joint germline variant calling")
         // GATK_JOINT_GERMLINE_VARIANT_CALLING(  filetest , run_haplotc , run_vqsr , fasta , fai , dict, sites , sites_index , joint_id , joint_intervals , allelespecific , resources , annotation , mode , false , truthsensitivity )
-    }
-
-    if (tumor_somatic) {
-        println("Performing tumor-only somatic variant calling")
-        // GATK_TUMOR_ONLY_SOMATIC_VARIANT_CALLING(  filetest , fasta , fai , dict , germline_resource , germline_resource_tbi , panel_of_normals , panel_of_normals_tbi )
-    }
-
-    if (tumor_normal_somatic) {
-        println("Performing tumor-normal somatic variant calling")
-        // GATK_TUMOR_NORMAL_SOMATIC_VARIANT_CALLING(  filetest , fasta , fai , dict , germline_resource , germline_resource_tbi , panel_of_normals , panel_of_normals_tbi )
     }
 
 }
@@ -93,9 +106,15 @@ workflow ATHOLL {
 def extract_samples(csv_file, alignment, paired, create_som_pon, joint_germline, tumor_somatic, tumor_normal_somatic) {
     firststep = Channel.from(csv_file).splitCsv(header: true).map{ row ->
         def meta = [:]
-        meta.id = row.SampleID
+        meta.id = row.EntryID
+        meta.sample = row.SampleID
         if (alignment) {
             meta.single_end = "$row.single_end"
+            meta.rgID = "$row.rgID"
+            meta.rgLB = "$row.rgLB"
+            meta.rgPL = "$row.rgPL"
+            meta.rgPU = "$row.rgPU"
+            meta.rgSM = "$row.rgSM"
             meta.read_group = "$row.readgroup"
             if (paired) {
                 println("paired end data")
@@ -113,11 +132,11 @@ def extract_samples(csv_file, alignment, paired, create_som_pon, joint_germline,
             [meta, file(row.input_file , checkIfExists : true), file(row.input_index , checkIfExists : true), file(row.intervals , checkIfExists : true), row.which_norm ]
         }
     }.groupTuple().map { meta, input_file, input_index, intervals_file, which_norm ->
-        def the_meta = meta
+        def the_meta = meta.clone()
         def input_files = input_file
         def input_indexes = input_index
         def intervals = intervals_file
-        def which_norms = which_norm
+        the_meta.norms = which_norm
         if (alignment){
             if (paired) {
                 return [the_meta, input_files[0], intervals]

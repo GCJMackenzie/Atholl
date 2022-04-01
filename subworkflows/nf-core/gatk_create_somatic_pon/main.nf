@@ -8,7 +8,7 @@ include { GATK4_CREATESOMATICPANELOFNORMALS } from '../../../modules/gatk4/creat
 
 workflow GATK_CREATE_SOMATIC_PON {
     take:
-    ch_mutect2_in       // channel: [ val(meta), [ input ], [ input_index ], intervals, [] ]
+    gendb_input         // channel: [ val(meta), [ vcf ], [ tbi ], intervals, [] ]
     fasta               // channel: /path/to/reference/fasta
     fai                 // channel: /path/to/reference/fasta/index
     dict                // channel: /path/to/reference/fasta/dictionary
@@ -17,19 +17,10 @@ workflow GATK_CREATE_SOMATIC_PON {
 
     main:
     ch_versions      = Channel.empty()
-    //
-    //Perform variant calling for each sample using mutect2 module in panel of normals mode.
-    //
-    println(ch_mutect2_in)
-    GATK4_MUTECT2 ( input, false, true, false, fasta, fai, dict, [], [], [], [] )
-    ch_versions = ch_versions.mix(GATK4_MUTECT2.out.versions.first())
 
     //
     //Convert all sample vcfs into a genomicsdb workspace using genomicsdbimport.
     //
-    ch_vcf = GATK4_MUTECT2.out.vcf.collect{it[1]}.toList()
-    ch_index = GATK4_MUTECT2.out.tbi.collect{it[1]}.toList()
-    gendb_input = Channel.of([[ id:pon_name ]]).combine(ch_vcf).combine(ch_index).combine([joint_interval_file]).combine(['']).combine([dict])
     GATK4_GENOMICSDBIMPORT ( gendb_input, false, false, false )
     ch_versions = ch_versions.mix(GATK4_GENOMICSDBIMPORT.out.versions.first())
 
@@ -41,9 +32,6 @@ workflow GATK_CREATE_SOMATIC_PON {
     ch_versions = ch_versions.mix(GATK4_CREATESOMATICPANELOFNORMALS.out.versions.first())
 
     emit:
-    mutect2_vcf      = GATK4_MUTECT2.out.vcf.collect()                     // channel: [ val(meta), [ vcf ] ]
-    mutect2_index    = GATK4_MUTECT2.out.tbi.collect()                     // channel: [ val(meta), [ tbi ] ]
-    mutect2_stats    = GATK4_MUTECT2.out.stats.collect()                   // channel: [ val(meta), [ stats ] ]
 
     genomicsdb       = GATK4_GENOMICSDBIMPORT.out.genomicsdb               // channel: [ val(meta), [ genomicsdb ] ]
 

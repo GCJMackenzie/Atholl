@@ -8,7 +8,7 @@ process GATK4_GETPILEUPSUMMARIES {
         'quay.io/biocontainers/gatk4:4.2.4.1--hdfd78af_0' }"
 
     input:
-    tuple val(meta), path(bam), path(bai), path(sites)
+    tuple val(meta), path(bam), path(bai), val(sites)
     path variants
     path variants_tbi
 

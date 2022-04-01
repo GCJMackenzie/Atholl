@@ -8,7 +8,7 @@ process GATK4_FILTERMUTECTCALLS {
         'quay.io/biocontainers/gatk4:4.2.4.1--hdfd78af_0' }"
 
     input:
-    tuple val(meta), path(vcf), path(tbi), path(stats), path(orientationbias), path(segmentation), path(contaminationfile), val(contaminationest)
+    tuple val(meta), path(vcf), path(tbi), path(stats), val(intervals), path(orientationbias), path(segmentation), path(contaminationfile), val(contaminationest)
     path fasta
     path fai
     path dict
@@ -26,6 +26,7 @@ process GATK4_FILTERMUTECTCALLS {
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
 
+    def intervals_options = intervals ? "-L ${intervals} " : ''
     def orientationbias_options = ''
     if (orientationbias) {
         orientationbias_options = '--orientation-bias-artifact-priors ' + orientationbias.join(' --orientation-bias-artifact-priors ')
@@ -50,6 +51,8 @@ process GATK4_FILTERMUTECTCALLS {
     gatk --java-options "-Xmx${avail_mem}g" FilterMutectCalls \\
         -R $fasta \\
         -V $vcf \\
+        --stats $stats \\
+        $intervals_options \\
         $orientationbias_options \\
         $segmentation_options \\
         $contamination_options \\

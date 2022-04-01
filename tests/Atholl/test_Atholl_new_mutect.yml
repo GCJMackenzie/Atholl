@@ -1,0 +1,44 @@
+- name: test_mutect_sompon
+  command: nextflow run ./tests/Atholl/test_Atholl_chunking.nf -entry test_mutect_sompon -c ./tests/config/nextflow.config -c ./tests/Atholl/nextflow_align.config
+  tags:
+    - subworkflows
+    - subworkflows/gatk_align_and_preprocess
+    - gatk4
+    # Modules
+    - bwamem2 index
+    - bwamem2 mem
+    - gatk4 applybqsr
+    - gatk4 BaseRecalibrator
+    - picard markduplicates
+    - picard sortsam
+    - samtools index
+
+# - name: test_mutect_to
+#   command: nextflow run ./tests/Atholl/test_Atholl_chunking.nf -entry test_mutect_to -c ./tests/config/nextflow.config -c ./tests/Atholl/nextflow_align.config
+#   tags:
+#     - subworkflows
+#     - subworkflows/gatk_align_and_preprocess
+#     - gatk4
+#     # Modules
+#     - bwamem2 index
+#     - bwamem2 mem
+#     - gatk4 applybqsr
+#     - gatk4 BaseRecalibrator
+#     - picard markduplicates
+#     - picard sortsam
+#     - samtools index
+
+# - name: test_mutect_tn
+#   command: nextflow run ./tests/Atholl/test_Atholl_chunking.nf -entry test_mutect_tn -c ./tests/config/nextflow.config -c ./tests/Atholl/nextflow_align.config
+#   tags:
+#     - subworkflows
+#     - subworkflows/gatk_align_and_preprocess
+#     - gatk4
+#     # Modules
+#     - bwamem2 index
+#     - bwamem2 mem
+#     - gatk4 applybqsr
+#     - gatk4 BaseRecalibrator
+#     - picard markduplicates
+#     - picard sortsam
+#     - samtools index

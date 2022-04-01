@@ -13,6 +13,7 @@
     - picard sortsam
     - samtools index
   files:
+    # GATK_ALIGN:
     # bwamem2 index
     - path: ./output/bwamem2/bwamem2/genome.fasta.amb
       md5sum: 1891c1de381b3a96d4e72f590fde20c1
@@ -33,6 +34,8 @@
     # samtools index
     - path: output/samtools/test.sorted.bam.bai
       md5sum: 244ea36279aa28a71a6cf4e96f539152
+
+    # GATK_PREPROCESS:
     # picard markduplicates
     - path: ./output/picard/test.markduplicates.MarkDuplicates.metrics.txt
       contains:
@@ -67,6 +70,7 @@
     - picard sortsam
     - samtools index
   files:
+    # GATK_ALIGN:
     # bwamem2 index
     - path: ./output/bwamem2/bwamem2/genome.fasta.amb
       md5sum: 1891c1de381b3a96d4e72f590fde20c1
@@ -93,6 +97,8 @@
       md5sum: 244ea36279aa28a71a6cf4e96f539152
     - path: output/samtools/test2.sorted.bam.bai
       md5sum: 4d03a5f682757e79e8ef95f78629b6c6
+
+    # GATK_PREPROCESS:
     # picard markduplicates
     - path: ./output/picard/test.markduplicates.MarkDuplicates.metrics.txt
       contains:

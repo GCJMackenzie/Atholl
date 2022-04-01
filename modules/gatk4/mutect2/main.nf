@@ -8,7 +8,7 @@ process GATK4_MUTECT2 {
         'quay.io/biocontainers/gatk4:4.2.4.1--hdfd78af_0' }"
 
     input:
-    tuple val(meta) , path(input) , path(input_index) , path(interval_label), val(which_norm)
+    tuple val(meta) , path(input) , path(input_index) , val(interval_label), val(which_norm)
     val  run_single
     val  run_pon
     val  run_mito
@@ -34,7 +34,7 @@ process GATK4_MUTECT2 {
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
     def panels_command = ''
-    def intervals_command = interval_label ? "${'-L ' + interval_label.join(' -L ')}" : ""
+    def intervals_command = interval_label ? "${'-L ' + interval_label}" : ""
     def normals_command = ''
 
     def inputs_command = '-I ' + input.join( ' -I ')
@@ -67,7 +67,7 @@ process GATK4_MUTECT2 {
         -R ${fasta} \\
         ${inputs_command} \\
         ${normals_command} \\
-        ${intervals_command} \\
+        -L ${interval_label} \\
         ${panels_command} \\
         -O ${prefix}.vcf.gz \\
         $args
