@@ -45,7 +45,7 @@ workflow GATK_TUMOR_ONLY_SOMATIC_VARIANT_CALLING {
     ch_contamination = GATK4_CALCULATECONTAMINATION.out.contamination
     ch_filter_results = ch_vcf.combine(ch_segment, by: 0).combine(ch_contamination, by: 0)
     ch_filtermutect_in = ch_filter_results.map{meta, bam, bai, vcf, tbi, stats, intervals, segment, contamination ->
-         [meta, vcf, tbi, stats, [], [], segment, contamination, []]}
+         [meta, vcf, tbi, stats, intervals, [], segment, contamination, []]}
      ch_filtermutect_in.view()
     GATK4_FILTERMUTECTCALLS ( ch_filtermutect_in, fasta, fai, dict )
     ch_versions = ch_versions.mix(GATK4_FILTERMUTECTCALLS.out.versions)
