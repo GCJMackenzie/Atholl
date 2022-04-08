@@ -10,17 +10,43 @@ include { GATK_CREATE_SOMATIC_PON } from './subworkflows/nf-core/gatk_create_som
 include { GATK_JOINT_GERMLINE_VARIANT_CALLING } from './subworkflows/nf-core/gatk_joint_germline_variant_calling/main'
 include { GATK_TUMOR_ONLY_SOMATIC_VARIANT_CALLING } from './subworkflows/nf-core/gatk_tumor_only_somatic_variant_calling/main'
 include { GATK_TUMOR_NORMAL_SOMATIC_VARIANT_CALLING } from './subworkflows/nf-core/gatk_tumor_normal_somatic_variant_calling/main'
+include { BWAMEM2_INDEX } from './modules/bwamem2/index/main.nf'
 
 workflow ATHOLL {
+
+//    fasta                 = params.genomes.'GATK.GRCh38'.fasta
+//    fai                   = params.genomes.'GATK.GRCh38'.fasta_fai
+//    dict                  = params.genomes.'GATK.GRCh38'.dict
+
+//    bwaindex              = params.genomes.'GATK.GRCh38'.bwa
+
+//    germline_resource     = params.genomes.'GATK.GRCh38'.germline_resource
+//    germline_resource_tbi = params.genomes.'GATK.GRCh38'.germline_resource_tbi
+
+//    sites                 = params.genomes.'GATK.GRCh38'.dbsnp
+//    sites_index           = params.genomes.'GATK.GRCh38'.dbsnp_tbi
+
+    fasta                 = file(params.test_data['homo_sapiens']['genome']['genome_fasta'], checkIfExists: true)
+    fai                   = file(params.test_data['homo_sapiens']['genome']['genome_fasta_fai'], checkIfExists: true)
+    dict                  = file(params.test_data['homo_sapiens']['genome']['genome_dict'], checkIfExists: true)
+
+    // BWAMEM2_INDEX( fasta )
+    bwaindex              = Channel.fromPath('/home/AD/gmackenz/Atholl/bwamem2/genome.fasta.{amb,ann,bwt.2bit.64,pac,0123}').collect()
+
+    germline_resource     = file(params.test_data['homo_sapiens']['genome']['gnomad_r2_1_1_21_vcf_gz'], checkIfExists: true)
+    germline_resource_tbi = file(params.test_data['homo_sapiens']['genome']['gnomad_r2_1_1_21_vcf_gz_tbi'], checkIfExists: true)
+
+    sites                 = file(params.test_data['homo_sapiens']['genome']['dbsnp_146_hg38_vcf_gz'], checkIfExists: true)
+    sites_index           = file(params.test_data['homo_sapiens']['genome']['dbsnp_146_hg38_vcf_gz_tbi'], checkIfExists: true)
+
+    panel_of_normals      = file(params.test_data['homo_sapiens']['genome']['mills_and_1000g_indels_21_vcf_gz'], checkIfExists: true)
+    panel_of_normals_tbi  = file(params.test_data['homo_sapiens']['genome']['mills_and_1000g_indels_21_vcf_gz_tbi'], checkIfExists: true)
 
     take:
 
     //universal args: these args are used by every subworkflow, input arg is used for passing in sample specific data, some of the array entries included are
     //not necessary for everysubworkflow, e.g which_norm, these are only passed in to the subworkflows that require them.
     input
-    fasta
-    fai
-    dict
 
     //entry params: used to control which subworkflow(s) are run
     alignment
@@ -31,19 +57,11 @@ workflow ATHOLL {
     paired
 
     //shared args: these args are used by two or more subworkflows, but are not universal, which subworkflows use them are noted.
-    sites                 // channel: /path/to/known/sites/file       align and preprocess + joint germline
-    sites_index           // channel: /path/to/known/sites/index      align and preprocess + joint germline
 
     joint_id              // channel: joint id for gendbs and pons    joint germline + create_som_pon
     joint_intervals       // channel: joint intervals file            joint germline + create_som_pon
 
-    germline_resource     // channel: /path/to/germline/resource      tumor_only + tumor_normal
-    germline_resource_tbi // channel: /path/to/germline/index         tumor_only + tumor_normal
-    panel_of_normals      // channel: /path/to/panel/of/normals       tumor_only + tumor_normal
-    panel_of_normals_tbi  // channel: /path/to/panel/of/normals/index tumor_only + tumor_normal
-
     // aligner args: args exclusive to align and preprocess subworkflow
-    bwaindex              // channel: /path/to/bwa/index/directory
     is_ubam               // channel: true/false whether input is in ubam format or not
     sort_order            // channel: which sort order to use for PICARD_SORTSAM_DUPLICATESMARKED
 
@@ -69,7 +87,7 @@ workflow ATHOLL {
 
     if (create_som_pon) {
         ch_mutect2_sub_in = GATK_PREPROCESS.out.applybqsr_out.combine(GATK_PREPROCESS.out.samtools_index_out, by: 0).combine(GATK_PREPROCESS.out.ch_intervals_out, by: 0).map{meta, bam, bai, intervals -> [meta, bam, bai, intervals, [] ]}
-        GATK_MUTECT2_CALLING(ch_mutect2_sub_in, false, false, true, fasta, fai, dict, germline_resource, germline_resource_tbi, panel_of_normals, panel_of_normals_tbi)
+        GATK_MUTECT2_CALLING(ch_mutect2_sub_in, false, false, true, fasta, fai, dict, [], [], [], [])
         ch_som_pon_vcf =  GATK_MUTECT2_CALLING.out.mutect2_vcf.collect{it[1]}.toList()
         ch__som_pon_index =  GATK_MUTECT2_CALLING.out.mutect2_tbi.collect{it[1]}.toList()
         ch_som_pon_in = Channel.of([[ id:joint_id ]]).combine(ch_som_pon_vcf).combine(ch__som_pon_index).combine([joint_intervals]).combine(['']).combine([dict])
@@ -99,6 +117,15 @@ workflow ATHOLL {
     if (joint_germline) {
         println("Performing joint germline variant calling")
         // GATK_JOINT_GERMLINE_VARIANT_CALLING(  filetest , run_haplotc , run_vqsr , fasta , fai , dict, sites , sites_index , joint_id , joint_intervals , allelespecific , resources , annotation , mode , false , truthsensitivity )
+    }
+
+    else {
+        println(fasta)
+        println(fai)
+        println(dict)
+        println(sites)
+        println(sites_index)
+        println(bwaindex)
     }
 
 }
