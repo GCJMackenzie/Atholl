@@ -7,7 +7,9 @@ include { SAMTOOLS_CHUNK } from './subworkflows/nf-core/samtools_chunking/main'
 include { GATK_PREPROCESS } from './subworkflows/nf-core/gatk_preprocess/main'
 include { GATK_MUTECT2_CALLING } from './subworkflows/nf-core/gatk_mutect2_calling/main'
 include { GATK_CREATE_SOMATIC_PON } from './subworkflows/nf-core/gatk_create_somatic_pon/main'
+include { GATK_HAPLOTYPECALLING} from './subworkflows/nf-core/gatk_haplotypecalling/main'
 include { GATK_JOINT_GERMLINE_VARIANT_CALLING } from './subworkflows/nf-core/gatk_joint_germline_variant_calling/main'
+include { GATK_VQSR} from './subworkflows/nf-core/gatk_vqsr/main'
 include { GATK_TUMOR_ONLY_SOMATIC_VARIANT_CALLING } from './subworkflows/nf-core/gatk_tumor_only_somatic_variant_calling/main'
 include { GATK_TUMOR_NORMAL_SOMATIC_VARIANT_CALLING } from './subworkflows/nf-core/gatk_tumor_normal_somatic_variant_calling/main'
 include { BWAMEM2_INDEX } from './modules/bwamem2/index/main.nf'
@@ -116,7 +118,17 @@ workflow ATHOLL {
 
     if (joint_germline) {
         println("Performing joint germline variant calling")
-        // GATK_JOINT_GERMLINE_VARIANT_CALLING(  filetest , run_haplotc , run_vqsr , fasta , fai , dict, sites , sites_index , joint_id , joint_intervals , allelespecific , resources , annotation , mode , false , truthsensitivity )
+
+        ch_haplotc_sub_in = GATK_PREPROCESS.out.applybqsr_out.combine(GATK_PREPROCESS.out.samtools_index_out, by: 0).combine(GATK_PREPROCESS.out.ch_intervals_out, by: 0).map{meta, bam, bai, intervals -> [meta, bam, bai, intervals ]}
+        GATK_HAPLOTYPECALLING(ch_haplotc_sub_in, fasta, fai, dict, sites, sites_index)
+
+        ch_joint_germ_vcf =  GATK_HAPLOTYPECALLING.out.haplotc_vcf.collect{it[1]}.toList()
+        ch__joint_germ_index =  GATK_HAPLOTYPECALLING.out.haplotc_index.collect{it[1]}.toList()
+        ch_joint_germ_in = Channel.of([[ id:joint_id ]]).combine(ch_joint_germ_vcf).combine(ch__joint_germ_index).combine([joint_intervals]).combine(['']).combine([dict])
+        GATK_JOINT_GERMLINE_VARIANT_CALLING(  ch_joint_germ_in, fasta, fai, dict, sites, sites_index )
+
+        GATK_JOINT_GERMLINE_VARIANT_CALLING.out.genotype_vcf.combine(GATK_JOINT_GERMLINE_VARIANT_CALLING.out.genotype_index, by: 0)
+        GATK_VQSR(filetest, fasta, fai, dict, allelespecific , resources , annotation , mode , false , truthsensitivity)
     }
 
     else {
