@@ -29,18 +29,19 @@ workflow ATHOLL {
 //    sites                 = params.genomes.'GATK.GRCh38'.dbsnp
 //    sites_index           = params.genomes.'GATK.GRCh38'.dbsnp_tbi
 
-    fasta                 = file(params.test_data['homo_sapiens']['genome']['genome_fasta'], checkIfExists: true)
-    fai                   = file(params.test_data['homo_sapiens']['genome']['genome_fasta_fai'], checkIfExists: true)
-    dict                  = file(params.test_data['homo_sapiens']['genome']['genome_dict'], checkIfExists: true)
+    fasta                 = file(params.test_data['homo_sapiens']['genome']['genome_21_fasta'], checkIfExists: true)
+    fai                   = file(params.test_data['homo_sapiens']['genome']['genome_21_fasta_fai'], checkIfExists: true)
+    dict                  = file(params.test_data['homo_sapiens']['genome']['genome_21_dict'], checkIfExists: true)
 
-    // BWAMEM2_INDEX( fasta )
-    bwaindex              = Channel.fromPath('/home/AD/gmackenz/Atholl/bwamem2/genome.fasta.{amb,ann,bwt.2bit.64,pac,0123}').collect()
+    BWAMEM2_INDEX( fasta )
+    bwaindex = BWAMEM2_INDEX.out.index
+    //bwaindex              = Channel.fromPath('/home/AD/gmackenz/Atholl/bwamem2/genome.fasta.{amb,ann,bwt.2bit.64,pac,0123}').collect()
 
     germline_resource     = file(params.test_data['homo_sapiens']['genome']['gnomad_r2_1_1_21_vcf_gz'], checkIfExists: true)
     germline_resource_tbi = file(params.test_data['homo_sapiens']['genome']['gnomad_r2_1_1_21_vcf_gz_tbi'], checkIfExists: true)
 
-    sites                 = file(params.test_data['homo_sapiens']['genome']['dbsnp_146_hg38_vcf_gz'], checkIfExists: true)
-    sites_index           = file(params.test_data['homo_sapiens']['genome']['dbsnp_146_hg38_vcf_gz_tbi'], checkIfExists: true)
+    sites                 = file(params.test_data['homo_sapiens']['genome']['dbsnp_138_hg38_21_vcf_gz'], checkIfExists: true)
+    sites_index           = file(params.test_data['homo_sapiens']['genome']['dbsnp_138_hg38_21_vcf_gz_tbi'], checkIfExists: true)
 
     panel_of_normals      = file(params.test_data['homo_sapiens']['genome']['mills_and_1000g_indels_21_vcf_gz'], checkIfExists: true)
     panel_of_normals_tbi  = file(params.test_data['homo_sapiens']['genome']['mills_and_1000g_indels_21_vcf_gz_tbi'], checkIfExists: true)
@@ -130,17 +131,17 @@ workflow ATHOLL {
         println('')
         ch_joint_germ_in = ch_haplo_out.combine([dict])
         ch_joint_germ_in.view()
-        // GATK_JOINT_GERMLINE_VARIANT_CALLING(  ch_joint_germ_in, fasta, fai, dict, sites, sites_index )
+        GATK_JOINT_GERMLINE_VARIANT_CALLING(  ch_joint_germ_in, fasta, fai, dict, sites, sites_index )
 
-        // ch_combine_vcf =  GATK_MUTECT2_CALLING.out.mutect2_vcf.collect{it[1]}.toList()
-        // ch__combine_tbi =  GATK_MUTECT2_CALLING.out.mutect2_tbi.collect{it[1]}.toList()
-        // ch_combine_in = Channel.of([[ id:joint_id ]]).combine(ch_combine_vcf).combine(ch__combine_tbi))
+        ch_merge_vcf =  GATK_JOINT_GERMLINE_VARIANT_CALLING.out.genotype_vcf.collect{it[1]}.toList()
+        ch_merge_in = Channel.of([[ id:joint_id ]]).combine(ch_merge_vcf)
+        ch_merge_in.view()
 
-        // ch_combine_in.view()
+        GATK4_MERGEVCFS(ch_merge_in, dict, true)
 
-        // GATK_JOINT_GERMLINE_VARIANT_CALLING.out.genotype_vcf.combine(GATK_JOINT_GERMLINE_VARIANT_CALLING.out.genotype_index, by: 0)
-
-        // GATK_VQSR(filetest, fasta, fai, dict, allelespecific , resources , annotation , mode , false , truthsensitivity)
+        ch_vqsr_in = GATK4_MERGEVCFS.out.vcf.combine(GATK4_MERGEVCFS.out.tbi, by: 0)
+        ch_vqsr_in.view()
+        // GATK_VQSR(ch_vqsr_in, fasta, fai, dict, allelespecific , resources , annotation , mode , false , truthsensitivity)
 
     }
 

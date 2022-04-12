@@ -16,6 +16,7 @@ workflow GATK_JOINT_GERMLINE_VARIANT_CALLING {
 
     main:
     ch_versions = Channel.empty()
+    ch_joint_intervals = input.map{ meta, vcf, tbi, intervals, interval, dummy -> [meta, intervals]  }
 
     //
     //Convert all sample vcfs into a genomicsdb workspace using genomicsdbimport.
@@ -31,7 +32,7 @@ workflow GATK_JOINT_GERMLINE_VARIANT_CALLING {
     ch_genotype_in = GATK4_GENOMICSDBIMPORT.out.genomicsdb.collect()
     //[] is a placeholder for the input where the vcf tbi file would be passed in for non-genomicsdb workspace runs, which is not necessary for this workflow as it uses genomicsdb workspaces.
     ch_genotype_in.add([])
-    genotype_input = ch_genotype_in.combine([joint_intervals])
+    genotype_input = ch_genotype_in.combine([ch_joint_intervals], by: 0)
     GATK4_GENOTYPEGVCFS ( genotype_input, fasta, fai, dict, sites, sites_index)
 
     ch_versions = ch_versions.mix(GATK4_GENOTYPEGVCFS.out.versions)
@@ -40,5 +41,5 @@ workflow GATK_JOINT_GERMLINE_VARIANT_CALLING {
     versions       = ch_versions                           // channel: [ versions.yml ]
     genomicsdb     = GATK4_GENOMICSDBIMPORT.out.genomicsdb // channel: [ val(meta), [ genomicsdb ] ]
     genotype_vcf   = GATK4_GENOTYPEGVCFS.out.vcf           // channel: [ val(meta), [ vcf ] ]
-    genotype_index = GATK4_GENOTYPEGVCFS.out.vcf           // channel: [ val(meta), [ tbi ] ]
+    genotype_index = GATK4_GENOTYPEGVCFS.out.tbi           // channel: [ val(meta), [ tbi ] ]
 }
