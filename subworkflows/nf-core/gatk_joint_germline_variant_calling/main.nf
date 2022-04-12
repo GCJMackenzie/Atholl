@@ -16,7 +16,7 @@ workflow GATK_JOINT_GERMLINE_VARIANT_CALLING {
 
     main:
     ch_versions = Channel.empty()
-    ch_joint_intervals = input.map{ meta, vcf, tbi, intervals, interval, dummy -> [meta, intervals]  }
+    ch_joint_intervals = input.map{ meta, vcf, tbi, intervals, interval, dummy -> [meta, interval]  }
 
     //
     //Convert all sample vcfs into a genomicsdb workspace using genomicsdbimport.
