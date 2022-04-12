@@ -16,7 +16,7 @@ workflow GATK_HAPLOTYPECALLING {
     main:
     ch_versions = Channel.empty()
 
-    haplotc_input = input.map{ meta, bam, bai, intervals -> [meta, bam, bai] }
+    haplotc_input = input
     haplotc_intervals = input.map{meta, bam, bai, intervals -> [meta, intervals] }
     //
     //Perform variant calling using haplotypecaller module. Additional argument "-ERC GVCF" used to run in gvcf mode.
