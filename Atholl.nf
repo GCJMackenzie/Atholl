@@ -123,12 +123,9 @@ workflow ATHOLL {
         GATK_HAPLOTYPECALLING(ch_haplotc_sub_in, fasta, fai, dict, sites, sites_index)
 
         ch_haplo_out = GATK_HAPLOTYPECALLING.out.haplotc_vcf.combine(GATK_HAPLOTYPECALLING.out.haplotc_index, by: 0).combine(GATK_HAPLOTYPECALLING.out.haplotc_interval_out, by: 0).groupTuple(by: 3).map{meta, vcf, tbi, intervals ->
-            def inter_meta = meta.clone()
+            def inter_meta = [:]
             inter_meta.id = "joint_$intervals"
             [ meta, vcf, tbi, intervals, [] ]}
-        ch_haplo_out.view()
-        println('')
-        println('')
         ch_joint_germ_in = ch_haplo_out.combine([dict])
         ch_joint_germ_in.view()
         GATK_JOINT_GERMLINE_VARIANT_CALLING(  ch_joint_germ_in, fasta, fai, dict, sites, sites_index )
