@@ -1,6 +1,6 @@
 //
-// Run GATK haplotypecaller for all input samples, merge them with genomicsdbimport, perform joint genotyping with genotypeGVCFS and recalibrate with variantrecalibrator & applyvqsr.
-//
+// merge samples with genomicsdbimport, perform joint genotyping with genotypeGVCFS
+
 
 include { GATK4_GENOMICSDBIMPORT } from '../../../modules/gatk4/genomicsdbimport/main'
 include { GATK4_GENOTYPEGVCFS } from '../../../modules/gatk4/genotypegvcfs/main'

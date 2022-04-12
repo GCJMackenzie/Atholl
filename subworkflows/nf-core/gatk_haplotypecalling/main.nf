@@ -6,7 +6,7 @@ include { GATK4_HAPLOTYPECALLER } from '../../../modules/gatk4/haplotypecaller/m
 
 workflow GATK_HAPLOTYPECALLING {
     take:
-    input            // channel: [ val(meta), [ input ], [ input_index ] ]
+    input            // channel: [ val(meta), [ input ], [ input_index ], [ intervals ] ]
     fasta            // channel: /path/to/reference/fasta
     fai              // channel: /path/to/reference/fasta/index
     dict             // channel: /path/to/reference/fasta/dictionary
@@ -16,7 +16,8 @@ workflow GATK_HAPLOTYPECALLING {
     main:
     ch_versions = Channel.empty()
 
-    haplotc_input = input
+    haplotc_input = input.map{ meta, bam, bai, intervals -> [meta, bam, bai] }
+    haplotc_intervals = input.map{meta, bam, bai, intervals -> [meta, intervals] }
     //
     //Perform variant calling using haplotypecaller module. Additional argument "-ERC GVCF" used to run in gvcf mode.
     //
@@ -30,4 +31,5 @@ workflow GATK_HAPLOTYPECALLING {
     versions       = ch_versions                      // channel: [ versions.yml ]
     haplotc_vcf    = GATK4_HAPLOTYPECALLER.out.vcf    // channel: [ val(meta), [ vcf ] ]
     haplotc_index  = GATK4_HAPLOTYPECALLER.out.tbi    // channel: [ val(meta), [ tbi ] ]
+    haplotc_interval_out = haplotc_intervals
 }

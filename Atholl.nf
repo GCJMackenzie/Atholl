@@ -12,7 +12,8 @@ include { GATK_JOINT_GERMLINE_VARIANT_CALLING } from './subworkflows/nf-core/gat
 include { GATK_VQSR} from './subworkflows/nf-core/gatk_vqsr/main'
 include { GATK_TUMOR_ONLY_SOMATIC_VARIANT_CALLING } from './subworkflows/nf-core/gatk_tumor_only_somatic_variant_calling/main'
 include { GATK_TUMOR_NORMAL_SOMATIC_VARIANT_CALLING } from './subworkflows/nf-core/gatk_tumor_normal_somatic_variant_calling/main'
-include { BWAMEM2_INDEX } from './modules/bwamem2/index/main.nf'
+include { GATK4_MERGEVCFS } from './modules/gatk4/mergevcfs/main'
+include { BWAMEM2_INDEX } from './modules/bwamem2/index/main'
 
 workflow ATHOLL {
 
@@ -68,8 +69,6 @@ workflow ATHOLL {
     sort_order            // channel: which sort order to use for PICARD_SORTSAM_DUPLICATESMARKED
 
     // joint germline args: args exclusive to joint germline subworkflow
-    run_haplotc
-    run_vqsr
     allelespecific        // channel: true/false run allelespecific mode of vqsr modules
     resources             // channel: [[resource, vcfs, forvariantrecal], [resource, tbis, forvariantrecal], [resource, labels, forvariantrecal]]
     annotation            // channel: [annotations, to, use, for, variantrecal, filtering]
@@ -122,13 +121,27 @@ workflow ATHOLL {
         ch_haplotc_sub_in = GATK_PREPROCESS.out.applybqsr_out.combine(GATK_PREPROCESS.out.samtools_index_out, by: 0).combine(GATK_PREPROCESS.out.ch_intervals_out, by: 0).map{meta, bam, bai, intervals -> [meta, bam, bai, intervals ]}
         GATK_HAPLOTYPECALLING(ch_haplotc_sub_in, fasta, fai, dict, sites, sites_index)
 
-        ch_joint_germ_vcf =  GATK_HAPLOTYPECALLING.out.haplotc_vcf.collect{it[1]}.toList()
-        ch__joint_germ_index =  GATK_HAPLOTYPECALLING.out.haplotc_index.collect{it[1]}.toList()
-        ch_joint_germ_in = Channel.of([[ id:joint_id ]]).combine(ch_joint_germ_vcf).combine(ch__joint_germ_index).combine([joint_intervals]).combine(['']).combine([dict])
-        GATK_JOINT_GERMLINE_VARIANT_CALLING(  ch_joint_germ_in, fasta, fai, dict, sites, sites_index )
+        ch_haplo_out = GATK_HAPLOTYPECALLING.out.haplotc_vcf.combine(GATK_HAPLOTYPECALLING.out.haplotc_index, by: 0).combine(GATK_HAPLOTYPECALLING.out.haplotc_index, by: 0).combine(GATK_HAPLOTYPECALLING.out.haplotc_interval_out, by: 0).groupTuple(by: 3).map{meta, vcf, tbi, intervals ->
+            def inter_meta = meta.clone()
+            inter_meta.id = "joint_$intervals"
+            [ meta, vcf, tbi, intervals, [] ]}
+        ch_haplo_out.view()
+        println('')
+        println('')
+        ch_joint_germ_in = ch_haplo_out.combine([dict])
+        ch_joint_germ_in.view()
+        // GATK_JOINT_GERMLINE_VARIANT_CALLING(  ch_joint_germ_in, fasta, fai, dict, sites, sites_index )
 
-        GATK_JOINT_GERMLINE_VARIANT_CALLING.out.genotype_vcf.combine(GATK_JOINT_GERMLINE_VARIANT_CALLING.out.genotype_index, by: 0)
-        GATK_VQSR(filetest, fasta, fai, dict, allelespecific , resources , annotation , mode , false , truthsensitivity)
+        // ch_combine_vcf =  GATK_MUTECT2_CALLING.out.mutect2_vcf.collect{it[1]}.toList()
+        // ch__combine_tbi =  GATK_MUTECT2_CALLING.out.mutect2_tbi.collect{it[1]}.toList()
+        // ch_combine_in = Channel.of([[ id:joint_id ]]).combine(ch_combine_vcf).combine(ch__combine_tbi))
+
+        // ch_combine_in.view()
+
+        // GATK_JOINT_GERMLINE_VARIANT_CALLING.out.genotype_vcf.combine(GATK_JOINT_GERMLINE_VARIANT_CALLING.out.genotype_index, by: 0)
+
+        // GATK_VQSR(filetest, fasta, fai, dict, allelespecific , resources , annotation , mode , false , truthsensitivity)
+
     }
 
     else {
