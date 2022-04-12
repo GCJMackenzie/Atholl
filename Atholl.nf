@@ -122,7 +122,7 @@ workflow ATHOLL {
         ch_haplotc_sub_in = GATK_PREPROCESS.out.applybqsr_out.combine(GATK_PREPROCESS.out.applybqsr_index_out, by: 0).combine(GATK_PREPROCESS.out.ch_intervals_out, by: 0)
         GATK_HAPLOTYPECALLING(ch_haplotc_sub_in, fasta, fai, dict, sites, sites_index)
 
-        ch_haplo_out = GATK_HAPLOTYPECALLING.out.haplotc_vcf.combine(GATK_HAPLOTYPECALLING.out.haplotc_index, by: 0).combine(GATK_HAPLOTYPECALLING.out.haplotc_index, by: 0).combine(GATK_HAPLOTYPECALLING.out.haplotc_interval_out, by: 0).groupTuple(by: 3).map{meta, vcf, tbi, intervals ->
+        ch_haplo_out = GATK_HAPLOTYPECALLING.out.haplotc_vcf.combine(GATK_HAPLOTYPECALLING.out.haplotc_index, by: 0).combine(GATK_HAPLOTYPECALLING.out.haplotc_interval_out, by: 0).groupTuple(by: 3).map{meta, vcf, tbi, intervals ->
             def inter_meta = meta.clone()
             inter_meta.id = "joint_$intervals"
             [ meta, vcf, tbi, intervals, [] ]}
