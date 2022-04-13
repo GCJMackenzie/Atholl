@@ -138,7 +138,7 @@ workflow ATHOLL {
 
         ch_vqsr_in = GATK4_MERGEVCFS.out.vcf.combine(GATK4_MERGEVCFS.out.tbi, by: 0)
         ch_vqsr_in.view()
-        // GATK_VQSR(ch_vqsr_in, fasta, fai, dict, allelespecific , resources , annotation , mode , false , truthsensitivity)
+        GATK_VQSR(ch_vqsr_in, fasta, fai, dict, allelespecific , resources , annotation , mode , false , truthsensitivity)
 
     }
 
