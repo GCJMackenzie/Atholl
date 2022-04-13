@@ -31,26 +31,26 @@ workflow GATK_VQSR {
     ch_versions   = ch_versions.mix(GATK4_SELECTVARIANTS_SNP.out.versions)
     
     ch_vrecal_snp_in = GATK4_SELECTVARIANTS_SNP.out.vcf.combine(GATK4_SELECTVARIANTS_SNP.out.tbi, by: 0)
-    GATK4_VARIANTRECALIBRATOR_SNP ( ch_vrecal_snp_in, fasta, fai, dict, allelespecific, resources, annotation, SNP, create_rscript )
+    GATK4_VARIANTRECALIBRATOR_SNP ( ch_vrecal_snp_in, fasta, fai, dict, allelespecific, resources, annotation, 'SNP', create_rscript )
     ch_versions   = ch_versions.mix(GATK4_VARIANTRECALIBRATOR_SNP.out.versions)
 
     ch_snp_recal      = GATK4_VARIANTRECALIBRATOR_SNP.out.recal
     ch_snp_idx        = GATK4_VARIANTRECALIBRATOR_SNP.out.idx
     ch_snp_tranches   = GATK4_VARIANTRECALIBRATOR_SNP.out.tranches
     ch_snp_vqsr_in    = ch_vrecal_snp_in.combine(ch_snp_recal, by: 0).combine(ch_snp_idx, by: 0).combine(ch_snp_tranches, by: 0)
-    GATK4_APPLYVQSR_SNP ( ch_snp_vqsr_in, fasta, fai, dict, allelespecific, truthsensitivity, SNP )
+    GATK4_APPLYVQSR_SNP ( ch_snp_vqsr_in, fasta, fai, dict, allelespecific, truthsensitivity, 'SNP' )
     ch_versions   = ch_versions.mix(GATK4_APPLYVQSR_SNP.out.versions)
 
     GATK4_SELECTVARIANTS_INDEL (ch_select_variants_in)
     
     ch_vrecal_indel_in = GATK4_SELECTVARIANTS_INDEL.out.vcf.combine(GATK4_SELECTVARIANTS_INDEL.out.tbi, by: 0)
-    GATK4_VARIANTRECALIBRATOR_INDEL ( ch_vrecal_indel_in, fasta, fai, dict, allelespecific, resources, annotation, INDEL, create_rscript )
+    GATK4_VARIANTRECALIBRATOR_INDEL ( ch_vrecal_indel_in, fasta, fai, dict, allelespecific, resources, annotation, 'INDEL', create_rscript )
 
     ch_indel_recal      = GATK4_VARIANTRECALIBRATOR_INDEL.out.recal
     ch_indel_idx        = GATK4_VARIANTRECALIBRATOR_INDEL.out.idx
     ch_indel_tranches   = GATK4_VARIANTRECALIBRATOR_INDEL.out.tranches
     ch_indel_vqsr_in    = ch_vrecal_indel_in.combine(ch_indel_recal, by: 0).combine(ch_indel_idx, by: 0).combine(ch_indel_tranches, by: 0)
-    GATK4_APPLYVQSR_INDEL ( ch_indel_vqsr_in, fasta, fai, dict, allelespecific, truthsensitivity, INDEL )
+    GATK4_APPLYVQSR_INDEL ( ch_indel_vqsr_in, fasta, fai, dict, allelespecific, truthsensitivity, 'INDEL' )
     
     GATK4_SELECTVARIANTS_NORECAL (ch_select_variants_in)
     

@@ -125,7 +125,7 @@ workflow ATHOLL {
         ch_haplo_out = GATK_HAPLOTYPECALLING.out.haplotc_vcf.combine(GATK_HAPLOTYPECALLING.out.haplotc_index, by: 0).combine(GATK_HAPLOTYPECALLING.out.haplotc_interval_out, by: 0).groupTuple(by: 3).map{meta, vcf, tbi, intervals ->
             def inter_meta = [:]
             inter_meta.id = "joint_$intervals"
-            [ meta, vcf, tbi, [], intervals ]}
+            [ inter_meta, vcf, tbi, [], intervals ]}
         ch_joint_germ_in = ch_haplo_out.combine([dict])
         ch_joint_germ_in.view()
         GATK_JOINT_GERMLINE_VARIANT_CALLING(  ch_joint_germ_in, fasta, fai, dict, sites, sites_index )
@@ -138,7 +138,7 @@ workflow ATHOLL {
 
         ch_vqsr_in = GATK4_MERGEVCFS.out.vcf.combine(GATK4_MERGEVCFS.out.tbi, by: 0)
         ch_vqsr_in.view()
-        GATK_VQSR(ch_vqsr_in, fasta, fai, dict, allelespecific , resources , annotation , mode , false , truthsensitivity)
+        GATK_VQSR(ch_vqsr_in, fasta, fai, dict, allelespecific , resources , annotation , false , truthsensitivity)
 
     }
 
