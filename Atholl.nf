@@ -131,7 +131,8 @@ workflow ATHOLL {
         GATK_JOINT_GERMLINE_VARIANT_CALLING(  ch_joint_germ_in, fasta, fai, dict, sites, sites_index )
         
         merge_vcf =  GATK_JOINT_GERMLINE_VARIANT_CALLING.out.genotype_vcf.collect{it[1]}.toList()
-        mergemap = [id: "joint_germline"]
+        def mergemap = [:]
+        mergemap.id = "joint_germline"
         ch_merge_vcf = Channel.from([mergemap, merge_vcf])
         
 
