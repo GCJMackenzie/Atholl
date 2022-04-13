@@ -25,7 +25,6 @@ workflow GATK_VQSR {
 
     main:
     ch_versions = Channel.empty()
-
     ch_select_variants_in = input
 
     GATK4_SELECTVARIANTS_SNP (ch_select_variants_in)
@@ -54,7 +53,10 @@ workflow GATK_VQSR {
     GATK4_APPLYVQSR_INDEL ( ch_indel_vqsr_in, fasta, fai, dict, allelespecific, truthsensitivity, INDEL )
     
     GATK4_SELECTVARIANTS_NORECAL (ch_select_variants_in)
-
+    
+    ch_merge_recal_in = GATK4_SELECTVARIANTS_NORECAL.out.vcf.mix(GATK4_APPLYVQSR_SNP.out.vcf).mix(GATK4_APPLYVQSR_INDEL.out.vcf).groupTuple(by: 3)
+    GATK4_MERGEVCFS_RECALIBRATED(ch_merge_recal_in, dict, true)
+    
     emit:
     versions       = ch_versions                                     // channel: [ versions.yml ]
     select_var_snp_vcf     = GATK4_SELECTVARIANTS_SNP.out.vcf
