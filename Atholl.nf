@@ -133,10 +133,8 @@ workflow ATHOLL {
         merge_vcf =  GATK_JOINT_GERMLINE_VARIANT_CALLING.out.genotype_vcf.collect{it[1]}.toList()
         def mergemap = [:]
         mergemap.id = "joint_germline"
-        ch_merge_vcf = Channel.from([mergemap, merge_vcf])
-        
 
-        GATK4_MERGEVCFS(ch_merge_vcf, dict, true)
+        GATK4_MERGEVCFS([mergemap, merge_vcf], dict, true)
 
         ch_vqsr_in = GATK4_MERGEVCFS.out.vcf.combine(GATK4_MERGEVCFS.out.tbi, by: 0)
         ch_vqsr_in.view()
