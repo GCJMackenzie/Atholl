@@ -8,7 +8,7 @@ process GATK4_GENOMICSDBIMPORT {
         'quay.io/biocontainers/gatk4:4.2.4.1--hdfd78af_0' }"
 
     input:
-    tuple val(meta), path(vcf), path(tbi), path(intervalfile), val(intervalval), path(wspace)
+    tuple val(meta), path(vcf), path(tbi), val(intervalfile), val(intervalval), path(wspace)
     val run_intlist
     val run_updatewspace
     val input_map
