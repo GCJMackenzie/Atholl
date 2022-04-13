@@ -130,11 +130,13 @@ workflow ATHOLL {
         ch_joint_germ_in.view()
         GATK_JOINT_GERMLINE_VARIANT_CALLING(  ch_joint_germ_in, fasta, fai, dict, sites, sites_index )
 
-        ch_merge_vcf =  GATK_JOINT_GERMLINE_VARIANT_CALLING.out.genotype_vcf.collect{it[1]}.toList()
-        ch_merge_in = Channel.of([[ id:joint_id ]]).combine(ch_merge_vcf)
-        ch_merge_in.view()
+        ch_merge_vcf =  GATK_JOINT_GERMLINE_VARIANT_CALLING.out.genotype_vcf.collect{it[1]}.toList().map{inlist -> 
+            def meta = [:]
+            meta.id = "joint_germline"
+            [ meta, inlist]}
+        ch_merge_vcf.view()
 
-        GATK4_MERGEVCFS(ch_merge_in, dict, true)
+        GATK4_MERGEVCFS(ch_merge_vcf, dict, true)
 
         ch_vqsr_in = GATK4_MERGEVCFS.out.vcf.combine(GATK4_MERGEVCFS.out.tbi, by: 0)
         ch_vqsr_in.view()
