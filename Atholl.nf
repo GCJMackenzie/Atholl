@@ -34,8 +34,8 @@ workflow ATHOLL {
     dict                  = file(params.test_data['homo_sapiens']['genome']['genome_21_dict'], checkIfExists: true)
 
     BWAMEM2_INDEX( fasta )
-    bwaindex = BWAMEM2_INDEX.out.index
-    //bwaindex              = Channel.fromPath('/home/AD/gmackenz/Atholl/bwamem2/genome.fasta.{amb,ann,bwt.2bit.64,pac,0123}').collect()
+    //bwaindex = BWAMEM2_INDEX.out.index
+    bwaindex              = Channel.fromPath('/home/AD/gmackenz/Atholl/bwamem2/genome.fasta.{amb,ann,bwt.2bit.64,pac,0123}').collect()
 
     germline_resource     = file(params.test_data['homo_sapiens']['genome']['gnomad_r2_1_1_21_vcf_gz'], checkIfExists: true)
     germline_resource_tbi = file(params.test_data['homo_sapiens']['genome']['gnomad_r2_1_1_21_vcf_gz_tbi'], checkIfExists: true)
@@ -127,19 +127,18 @@ workflow ATHOLL {
             inter_meta.id = "joint_$intervals"
             [ inter_meta, vcf, tbi, [], intervals ]}
         ch_joint_germ_in = ch_haplo_out.combine([dict])
-        ch_joint_germ_in.view()
         GATK_JOINT_GERMLINE_VARIANT_CALLING(  ch_joint_germ_in, fasta, fai, dict, sites, sites_index )
-        
-        merge_vcf =  GATK_JOINT_GERMLINE_VARIANT_CALLING.out.genotype_vcf.collect{it[1]}.toList()
+
+        merge_vcf =  GATK_JOINT_GERMLINE_VARIANT_CALLING.out.genotype_vcf.collect()
         merge_vcf.view()
-        def mergemap = [:]
-        mergemap.id = "joint_germline"
+//        def mergemap = [:]
+//        mergemap.id = "joint_germline"
 
-        GATK4_MERGEVCFS([mergemap, merge_vcf], dict, true)
+//        GATK4_MERGEVCFS([mergemap, merge_vcf], dict, true)
 
-        ch_vqsr_in = GATK4_MERGEVCFS.out.vcf.combine(GATK4_MERGEVCFS.out.tbi, by: 0)
-        ch_vqsr_in.view()
-        GATK_VQSR(ch_vqsr_in, fasta, fai, dict, allelespecific , resources , annotation , false , truthsensitivity)
+//        ch_vqsr_in = GATK4_MERGEVCFS.out.vcf.combine(GATK4_MERGEVCFS.out.tbi, by: 0)
+//        ch_vqsr_in.view()
+//        GATK_VQSR(ch_vqsr_in, fasta, fai, dict, allelespecific , resources , annotation , false , truthsensitivity)
 
     }
 

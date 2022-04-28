@@ -24,7 +24,7 @@ workflow test_fastq_to_recalbam {
     sites_index           = file(params.test_data['homo_sapiens']['genome']['dbsnp_146_hg38_vcf_gz_tbi'], checkIfExists: true)
 
     joint_id              = []
-    joint_intervals       = file('/home/gavin_mackenzie_nibsc_org/code/Atholl/tests/Atholl/test_shortened_intervals.bed', checkIfExists: true)
+    joint_intervals       = file('/home/AD/gmackenz/Atholl/Atholl/tests/Atholl/test_shortened_intervals.bed', checkIfExists: true)
 
     germline_resource     = []
     germline_resource_tbi = []
@@ -257,7 +257,7 @@ workflow test_empty {
 }
 
 workflow test_joint_germ {
-    input           = file('/home/gavin_mackenzie_nibsc_org/code/Atholl/tests/Atholl/test_short_germline.csv', checkIfExists : true)
+    input           = file('/home/AD/gmackenz/Atholl/Atholl/tests/Atholl/test_short_germline.csv', checkIfExists : true)
 
     alignment             = true
     create_som_pon        = false
@@ -267,7 +267,7 @@ workflow test_joint_germ {
     paired                = true
 
     joint_id              = "joint_germline"
-    joint_intervals       = file('/home/gavin_mackenzie_nibsc_org/code/Atholl/tests/Atholl/test_shortened_intervals.bed', checkIfExists: true)
+    joint_intervals       = file('/home/AD/gmackenz/Atholl/Atholl/tests/Atholl/test_shortened_intervals.bed', checkIfExists: true)
 
     is_ubam               = false
     sort_order            = "coordinate"
