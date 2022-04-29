@@ -130,14 +130,17 @@ workflow ATHOLL {
         GATK_JOINT_GERMLINE_VARIANT_CALLING(  ch_joint_germ_in, fasta, fai, dict, sites, sites_index )
 
         merge_vcf =  GATK_JOINT_GERMLINE_VARIANT_CALLING.out.genotype_vcf.collect()
-        merge_vcf.view()
-//        def mergemap = [:]
-//        mergemap.id = "joint_germline"
+        mergemap = merge_vcf.map{ meta, vcf ->
+            def mergemeta = [:]
+            mergemeta.id = "joint_germline"
+            [mergemeta, vcf]
+        }
+        mergemap.view()
 
-//        GATK4_MERGEVCFS([mergemap, merge_vcf], dict, true)
+        GATK4_MERGEVCFS(mergemap, dict, true)
 
-//        ch_vqsr_in = GATK4_MERGEVCFS.out.vcf.combine(GATK4_MERGEVCFS.out.tbi, by: 0)
-//        ch_vqsr_in.view()
+        ch_vqsr_in = GATK4_MERGEVCFS.out.vcf.combine(GATK4_MERGEVCFS.out.tbi, by: 0)
+        ch_vqsr_in.view()
 //        GATK_VQSR(ch_vqsr_in, fasta, fai, dict, allelespecific , resources , annotation , false , truthsensitivity)
 
     }
