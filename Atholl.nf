@@ -122,15 +122,15 @@ workflow ATHOLL {
         ch_haplotc_sub_in = GATK_PREPROCESS.out.applybqsr_out.combine(GATK_PREPROCESS.out.applybqsr_index_out, by: 0).combine(GATK_PREPROCESS.out.ch_intervals_out, by: 0)
         GATK_HAPLOTYPECALLING(ch_haplotc_sub_in, fasta, fai, dict, sites, sites_index)
 
-        ch_haplo_out = GATK_HAPLOTYPECALLING.out.haplotc_vcf.combine(GATK_HAPLOTYPECALLING.out.haplotc_index, by: 0).combine(GATK_HAPLOTYPECALLING.out.haplotc_interval_out, by: 0).groupTuple(by: 3).map{meta, vcf, tbi, intervals ->
+        ch_haplo_out = GATK_HAPLOTYPECALLING.out.renamed_vcf.combine(GATK_HAPLOTYPECALLING.out.renamed_index, by: 0).combine(GATK_HAPLOTYPECALLING.out.haplotc_interval_out, by: 0).groupTuple(by: 3).map{meta, vcf, tbi, intervals ->
             def inter_meta = [:]
             inter_meta.id = "joint_$intervals"
             [ inter_meta, vcf, tbi, [], intervals ]}
         ch_joint_germ_in = ch_haplo_out.combine([dict])
         GATK_JOINT_GERMLINE_VARIANT_CALLING(  ch_joint_germ_in, fasta, fai, dict, sites, sites_index )
 
-        merge_vcf =  GATK_JOINT_GERMLINE_VARIANT_CALLING.out.genotype_vcf.collect()
-        mergemap = merge_vcf.map{ meta, vcf ->
+        merge_vcf =  GATK_JOINT_GERMLINE_VARIANT_CALLING.out.genotype_vcf.collect{it[1]}
+        mergemap = merge_vcf.map{ vcf ->
             def mergemeta = [:]
             mergemeta.id = "joint_germline"
             [mergemeta, vcf]
