@@ -31,15 +31,15 @@ workflow GATK_VQSR {
     ch_versions   = ch_versions.mix(GATK4_SELECTVARIANTS_SNP.out.versions)
 
     ch_vrecal_snp_in = GATK4_SELECTVARIANTS_SNP.out.vcf.combine(GATK4_SELECTVARIANTS_SNP.out.tbi, by: 0)
-    //GATK4_VARIANTRECALIBRATOR_SNP ( ch_vrecal_snp_in, fasta, fai, dict, allelespecific, resources, annotation, 'SNP', create_rscript )
-    //ch_versions   = ch_versions.mix(GATK4_VARIANTRECALIBRATOR_SNP.out.versions)
+    GATK4_VARIANTRECALIBRATOR_SNP ( ch_vrecal_snp_in, fasta, fai, dict, allelespecific, resources, annotation, 'SNP', create_rscript )
+    ch_versions   = ch_versions.mix(GATK4_VARIANTRECALIBRATOR_SNP.out.versions)
 
-    //ch_snp_recal      = GATK4_VARIANTRECALIBRATOR_SNP.out.recal
-    //ch_snp_idx        = GATK4_VARIANTRECALIBRATOR_SNP.out.idx
-    //ch_snp_tranches   = GATK4_VARIANTRECALIBRATOR_SNP.out.tranches
-    //ch_snp_vqsr_in    = ch_vrecal_snp_in.combine(ch_snp_recal, by: 0).combine(ch_snp_idx, by: 0).combine(ch_snp_tranches, by: 0)
-    //GATK4_APPLYVQSR_SNP ( ch_snp_vqsr_in, fasta, fai, dict, allelespecific, truthsensitivity, 'SNP' )
-    //ch_versions   = ch_versions.mix(GATK4_APPLYVQSR_SNP.out.versions)
+    ch_snp_recal      = GATK4_VARIANTRECALIBRATOR_SNP.out.recal
+    ch_snp_idx        = GATK4_VARIANTRECALIBRATOR_SNP.out.idx
+    ch_snp_tranches   = GATK4_VARIANTRECALIBRATOR_SNP.out.tranches
+    ch_snp_vqsr_in    = ch_vrecal_snp_in.combine(ch_snp_recal, by: 0).combine(ch_snp_idx, by: 0).combine(ch_snp_tranches, by: 0)
+    GATK4_APPLYVQSR_SNP ( ch_snp_vqsr_in, fasta, fai, dict, allelespecific, truthsensitivity, 'SNP' )
+    ch_versions   = ch_versions.mix(GATK4_APPLYVQSR_SNP.out.versions)
 
     GATK4_SELECTVARIANTS_INDEL (ch_select_variants_in)
 
@@ -62,11 +62,11 @@ workflow GATK_VQSR {
     versions       = ch_versions                                     // channel: [ versions.yml ]
     select_var_snp_vcf     = GATK4_SELECTVARIANTS_SNP.out.vcf
     select_var_snp_tbi     = GATK4_SELECTVARIANTS_SNP.out.tbi
-//    recal_snp_file     = GATK4_VARIANTRECALIBRATOR_SNP.out.recal // channel: [ val(meta), [ recal ] ]
-//    recal_snp_index    = GATK4_VARIANTRECALIBRATOR_SNP.out.idx   // channel: [ val(meta), [ idx ] ]
-//    recal_snp_tranches = GATK4_VARIANTRECALIBRATOR_SNP.out.tranches // channel: [ val(meta), [ tranches ] ]
-//    vqsr_snp_vcf       = GATK4_APPLYVQSR_SNP.out.vcf             // channel: [ val(meta), [ vcf ] ]
-//    vqsr_snp_index     = GATK4_APPLYVQSR_SNP.out.tbi             // channel: [ val(meta), [ tbi ] ]
+    recal_snp_file     = GATK4_VARIANTRECALIBRATOR_SNP.out.recal // channel: [ val(meta), [ recal ] ]
+    recal_snp_index    = GATK4_VARIANTRECALIBRATOR_SNP.out.idx   // channel: [ val(meta), [ idx ] ]
+    recal_snp_tranches = GATK4_VARIANTRECALIBRATOR_SNP.out.tranches // channel: [ val(meta), [ tranches ] ]
+    vqsr_snp_vcf       = GATK4_APPLYVQSR_SNP.out.vcf             // channel: [ val(meta), [ vcf ] ]
+    vqsr_snp_index     = GATK4_APPLYVQSR_SNP.out.tbi             // channel: [ val(meta), [ tbi ] ]
 
     select_var_indel_vcf     = GATK4_SELECTVARIANTS_INDEL.out.vcf
     select_var_indel_tbi     = GATK4_SELECTVARIANTS_INDEL.out.tbi
