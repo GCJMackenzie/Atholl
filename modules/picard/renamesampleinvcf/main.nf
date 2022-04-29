@@ -11,8 +11,7 @@ process PICARD_RENAMESAMPLEINVCF {
     tuple val(meta), path(vcf)
 
     output:
-    tuple val(meta), path("*.vcf")        , emit: vcf
-    tuple val(meta), path("*.tbi")        , emit: tbi
+    tuple val(meta), path("*.vcf.gz")        , emit: vcf
     path  "versions.yml"                  , emit: versions
 
     when:
@@ -33,9 +32,8 @@ process PICARD_RENAMESAMPLEINVCF {
         RenameSampleInVcf \\
         $args \\
         INPUT=$vcf \\
-        OUTPUT=${prefix}.renamed.g.vcf \\
-        NEW_SAMPLE_NAME=${meta.sample} \\
-        --CREATE_INDEX true
+        OUTPUT=${prefix}.renamed.g.vcf.gz \\
+        NEW_SAMPLE_NAME=${meta.sample}
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
