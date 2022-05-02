@@ -257,7 +257,7 @@ workflow test_empty {
 }
 
 workflow test_joint_germ {
-    input           = file('/home/AD/gmackenz/Atholl/Atholl/tests/Atholl/test_short_germline.csv', checkIfExists : true)
+    input           = file('/home/gavin_mackenzie_nibsc_org/code/Atholl/tests/Atholl/test_long_germline.csv', checkIfExists : true)
 
     alignment             = true
     create_som_pon        = false
