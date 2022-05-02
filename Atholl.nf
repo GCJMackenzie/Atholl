@@ -29,22 +29,22 @@ workflow ATHOLL {
 //    sites                 = params.genomes.'GATK.GRCh38'.dbsnp
 //    sites_index           = params.genomes.'GATK.GRCh38'.dbsnp_tbi
 
-    fasta                 = file(params.test_data['homo_sapiens']['genome']['genome_21_fasta'], checkIfExists: true)
-    fai                   = file(params.test_data['homo_sapiens']['genome']['genome_21_fasta_fai'], checkIfExists: true)
-    dict                  = file(params.test_data['homo_sapiens']['genome']['genome_21_dict'], checkIfExists: true)
+    fasta                 = file('gs://genomics-public-data/resources/broad/hg38/v0/Homo_sapiens_assembly38.fasta', checkIfExists: true)
+    fai                   = file('gs://genomics-public-data/resources/broad/hg38/v0/Homo_sapiens_assembly38.fasta.fai', checkIfExists: true)
+    dict                  = file('gs://genomics-public-data/resources/broad/hg38/v0/Homo_sapiens_assembly38.dict', checkIfExists: true)
 
     BWAMEM2_INDEX( fasta )
-    //bwaindex = BWAMEM2_INDEX.out.index
-    bwaindex              = Channel.fromPath('/home/AD/gmackenz/Atholl/bwamem2/genome.fasta.{amb,ann,bwt.2bit.64,pac,0123}').collect()
+    bwaindex = BWAMEM2_INDEX.out.index
+    // bwaindex              = Channel.fromPath('/home/AD/gmackenz/Atholl/bwamem2/genome.fasta.{amb,ann,bwt.2bit.64,pac,0123}').collect()
 
-    germline_resource     = file(params.test_data['homo_sapiens']['genome']['gnomad_r2_1_1_21_vcf_gz'], checkIfExists: true)
-    germline_resource_tbi = file(params.test_data['homo_sapiens']['genome']['gnomad_r2_1_1_21_vcf_gz_tbi'], checkIfExists: true)
+    germline_resource     = file('gs://genomics-public-data/resources/broad/hg38/v0/Homo_sapiens_assembly38.known_indels.vcf.gz', checkIfExists: true)
+    germline_resource_tbi = file('gs://genomics-public-data/resources/broad/hg38/v0/Homo_sapiens_assembly38.known_indels.vcf.gz', checkIfExists: true)
 
-    sites                 = file(params.test_data['homo_sapiens']['genome']['dbsnp_138_hg38_21_vcf_gz'], checkIfExists: true)
-    sites_index           = file(params.test_data['homo_sapiens']['genome']['dbsnp_138_hg38_21_vcf_gz_tbi'], checkIfExists: true)
+    sites                 = file('gs://genomics-public-data/resources/broad/hg38/v0/Homo_sapiens_assembly38.dbsnp138.vcf', checkIfExists: true)
+    sites_index           = file('gs://genomics-public-data/resources/broad/hg38/v0/Homo_sapiens_assembly38.dbsnp138.vcf.idx', checkIfExists: true)
 
-    panel_of_normals      = file(params.test_data['homo_sapiens']['genome']['mills_and_1000g_indels_21_vcf_gz'], checkIfExists: true)
-    panel_of_normals_tbi  = file(params.test_data['homo_sapiens']['genome']['mills_and_1000g_indels_21_vcf_gz_tbi'], checkIfExists: true)
+    panel_of_normals      = file('gs://genomics-public-data/resources/broad/hg38/v0/Mills_and_1000G_gold_standard.indels.hg38.vcf.gz', checkIfExists: true)
+    panel_of_normals_tbi  = file('gs://genomics-public-data/resources/broad/hg38/v0/Mills_and_1000G_gold_standard.indels.hg38.vcf.gz.tbi', checkIfExists: true)
 
     take:
 
