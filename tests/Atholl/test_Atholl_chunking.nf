@@ -170,7 +170,7 @@ workflow test_mutect_to {
     mode                  = []
     truthsensitivity      = []
 
-    ATHOLL ( input, alignment, create_som_pon, joint_germline, tumor_somatic, tumor_normal_somatic, paired, joint_id, joint_intervals, is_ubam, sort_order, run_haplotc, run_vqsr, allelespecific, resources, annotation, mode, truthsensitivity )
+    ATHOLL ( input, alignment, create_som_pon, joint_germline, tumor_somatic, tumor_normal_somatic, paired, joint_id, joint_intervals, is_ubam, sort_order, allelespecific, resources, annotation, mode, truthsensitivity )
 }
 
 workflow test_mutect_tn {
