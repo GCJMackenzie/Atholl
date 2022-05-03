@@ -115,6 +115,17 @@ workflow ATHOLL {
         ch_tumor_only_in = GATK_PREPROCESS.out.applybqsr_out.combine(GATK_PREPROCESS.out.samtools_index_out, by: 0).combine(GATK_MUTECT2_CALLING.out.mutect2_vcf, by: 0).combine(GATK_MUTECT2_CALLING.out.mutect2_tbi, by: 0).combine(GATK_MUTECT2_CALLING.out.mutect2_stats, by: 0).combine(GATK_MUTECT2_CALLING.out.mutect2_intervals, by: 0)
         println("Performing tumor-only somatic variant calling")
         GATK_TUMOR_ONLY_SOMATIC_VARIANT_CALLING(  ch_tumor_only_in , fasta , fai , dict , germline_resource , germline_resource_tbi)
+
+        calling_out =  GATK_TUMOR_ONLY_SOMATIC_VARIANT_CALLING.out.renamed_vcf
+        mergemap = calling_out.map{ meta, vcf ->
+            def mergemeta = [:]
+            mergemeta.id = meta.sample
+            [mergemeta, vcf]
+        }.groupTuple(by: 0)
+
+        mergemap.view()
+
+        GATK4_MERGEVCFS(mergemap, dict, true)
     }
 
     if (tumor_normal_somatic) {

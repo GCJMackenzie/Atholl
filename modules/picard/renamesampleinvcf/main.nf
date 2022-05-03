@@ -32,7 +32,7 @@ process PICARD_RENAMESAMPLEINVCF {
         RenameSampleInVcf \\
         $args \\
         INPUT=$vcf \\
-        OUTPUT=${prefix}.renamed.g.vcf.gz \\
+        OUTPUT=${prefix}.vcf.gz \\
         NEW_SAMPLE_NAME=${meta.sample}
 
     cat <<-END_VERSIONS > versions.yml

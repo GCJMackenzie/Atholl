@@ -5,6 +5,7 @@
 include { GATK4_GETPILEUPSUMMARIES     } from '../../../modules/gatk4/getpileupsummaries/main'
 include { GATK4_CALCULATECONTAMINATION } from '../../../modules/gatk4/calculatecontamination/main'
 include { GATK4_FILTERMUTECTCALLS      } from '../../../modules/gatk4/filtermutectcalls/main'
+include { PICARD_RENAMESAMPLEINVCF as PICARD_RENAMESOMATICSAMPLEINVCF} from '../../../modules/picard/renamesampleinvcf/main'
 
 workflow GATK_TUMOR_ONLY_SOMATIC_VARIANT_CALLING {
     take:
@@ -50,6 +51,9 @@ workflow GATK_TUMOR_ONLY_SOMATIC_VARIANT_CALLING {
     GATK4_FILTERMUTECTCALLS ( ch_filtermutect_in, fasta, fai, dict )
     ch_versions = ch_versions.mix(GATK4_FILTERMUTECTCALLS.out.versions)
 
+    PICARD_RENAMESOMATICSAMPLEINVCF ( GATK4_FILTERMUTECTCALLS.out.vcf )
+    ch_versions = ch_versions.mix(PICARD_RENAMESOMATICSAMPLEINVCF.out.versions)
+
     emit:
 
     pileup_table        = GATK4_GETPILEUPSUMMARIES.out.table             // channel: [ val(meta), [ table ] ]
@@ -60,6 +64,8 @@ workflow GATK_TUMOR_ONLY_SOMATIC_VARIANT_CALLING {
     filtered_vcf        = GATK4_FILTERMUTECTCALLS.out.vcf                // channel: [ val(meta), [ vcf ] ]
     filtered_index      = GATK4_FILTERMUTECTCALLS.out.tbi                // channel: [ val(meta), [ tbi ] ]
     filtered_stats      = GATK4_FILTERMUTECTCALLS.out.stats              // channel: [ val(meta), [ stats ] ]
+
+    renamed_vcf    = PICARD_RENAMESOMATICSAMPLEINVCF.out.vcf    // channel: [ val(meta), [ vcf ] ]
 
     versions            = ch_versions                                              // channel: [ versions.yml ]
 }
