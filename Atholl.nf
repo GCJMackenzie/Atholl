@@ -37,8 +37,9 @@ workflow ATHOLL {
     // fai                   = file(params.test_data['homo_sapiens']['genome']['genome_21_fasta_fai'], checkIfExists: true)
     // dict                  = file(params.test_data['homo_sapiens']['genome']['genome_21_dict'], checkIfExists: true)
 
-    BWAMEM2_INDEX( fasta )
-    bwaindex = BWAMEM2_INDEX.out.index
+    // BWAMEM2_INDEX( fasta )
+    // bwaindex = BWAMEM2_INDEX.out.index
+    bwaindex = Channel.fromPath('gs://mhra-ngs-dev-0yzc-nextflow/bwamem2').collect()
     // bwaindex              = Channel.fromPath('/home/AD/gmackenz/Atholl/bwamem2/genome.fasta.{amb,ann,bwt.2bit.64,pac,0123}').collect()
 
     germline_resource     = file('gs://genomics-public-data/resources/broad/hg38/v0/Homo_sapiens_assembly38.known_indels.vcf.gz', checkIfExists: true)
