@@ -68,6 +68,7 @@ workflow ATHOLL {
 
     //entry params: used to control which subworkflow(s) are run
     alignment
+    chunking
     create_som_pon
     joint_germline
     tumor_somatic
@@ -91,12 +92,19 @@ workflow ATHOLL {
     truthsensitivity      // channel: 0-100.0 truthsensitivity cutoff for applyvqsr
 
     main:
-        filetest = extract_samples(input, alignment, paired, create_som_pon, joint_germline, tumor_somatic, tumor_normal_somatic)
+        filetest = extract_samples(input, alignment, paired, chunking, create_som_pon, joint_germline, tumor_somatic, tumor_normal_somatic)
 
     if (alignment) {
         println("The aligner is running")
         GATK_ALIGN( filetest , fasta , fai , dict , bwaindex , is_ubam , sort_order )
         ch_chunk_in = GATK_ALIGN.out.sortsam_out.combine(GATK_ALIGN.out.samtools_index_out, by: 0)
+        SAMTOOLS_CHUNK(ch_chunk_in, joint_intervals)
+        GATK_PREPROCESS( SAMTOOLS_CHUNK.out.ch_format_out , fasta , fai , dict , sort_order, sites, sites_index )
+    }
+    
+    if (chunking) {
+        println("skip to chunking")
+        ch_chunk_in = filetest
         SAMTOOLS_CHUNK(ch_chunk_in, joint_intervals)
         GATK_PREPROCESS( SAMTOOLS_CHUNK.out.ch_format_out , fasta , fai , dict , sort_order, sites, sites_index )
     }
@@ -181,7 +189,7 @@ workflow ATHOLL {
 
 }
 
-def extract_samples(csv_file, alignment, paired, create_som_pon, joint_germline, tumor_somatic, tumor_normal_somatic) {
+def extract_samples(csv_file, alignment, paired, chunking, create_som_pon, joint_germline, tumor_somatic, tumor_normal_somatic) {
     firststep = Channel.from(csv_file).splitCsv(header: true).map{ row ->
         def meta = [:]
         meta.id = row.EntryID
@@ -202,6 +210,17 @@ def extract_samples(csv_file, alignment, paired, create_som_pon, joint_germline,
                 println("interleaved or ubam")
                 [meta, file(row.input_file , checkIfExists : true), row.input_index, file(row.intervals , checkIfExists : true), row.which_norm ]
             }
+        } else if (chunking) {
+            meta.single_end = "$row.single_end"
+            meta.rgID = "$row.rgID"
+            meta.rgLB = "$row.rgLB"
+            meta.rgPL = "$row.rgPL"
+            meta.rgPU = "$row.rgPU"
+            meta.rgSM = "$row.rgSM"
+            meta.read_group = "$row.readgroup"
+            println("aligned files")
+            [meta, file(row.input_file , checkIfExists : true), file(row.input_index, checkIfExists : true), row.intervals, row.which_norm ]
+        
         } else if (create_som_pon) {
             println("pon")
             [meta, file(row.input_file , checkIfExists : true), file(row.input_index , checkIfExists : true), row.intervals, row.which_norm ]
@@ -221,6 +240,8 @@ def extract_samples(csv_file, alignment, paired, create_som_pon, joint_germline,
             } else {
                 return [the_meta, input_files, intervals]
             }
+        } else if (chunking) {
+            return [the_meta, input_files, input_indexes]
         } else if (joint_germline) {
             return [the_meta, input_files, input_indexes, intervals]
         } else if (tumor_normal_somatic) {
