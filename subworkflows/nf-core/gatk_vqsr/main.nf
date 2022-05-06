@@ -54,8 +54,8 @@ workflow GATK_VQSR {
 
     GATK4_SELECTVARIANTS_NORECAL (ch_select_variants_in)
 
-    ch_merge_recal_in = GATK4_SELECTVARIANTS_NORECAL.out.vcf.mix(GATK4_APPLYVQSR_SNP.out.vcf).mix(GATK4_APPLYVQSR_INDEL.out.vcf).groupTuple(by: 3)
-    GATK4_MERGEVCFS_RECALIBRATED(ch_merge_recal_in, dict, true)
+//    ch_merge_recal_in = GATK4_SELECTVARIANTS_NORECAL.out.vcf.mix(GATK4_APPLYVQSR_SNP.out.vcf).mix(GATK4_APPLYVQSR_INDEL.out.vcf).groupTuple(by: 3)
+//    GATK4_MERGEVCFS_RECALIBRATED(ch_merge_recal_in, dict, true)
 
     emit:
     versions       = ch_versions                                     // channel: [ versions.yml ]
@@ -78,6 +78,6 @@ workflow GATK_VQSR {
     select_var_norecal_vcf     = GATK4_SELECTVARIANTS_NORECAL.out.vcf
     select_var_norecal_tbi     = GATK4_SELECTVARIANTS_NORECAL.out.tbi
 
-    merged_recal_vcf     = GATK4_MERGEVCFS_RECALIBRATED.out.vcf
-    merged_recal_tbi     = GATK4_MERGEVCFS_RECALIBRATED.out.tbi
+//    merged_recal_vcf     = GATK4_MERGEVCFS_RECALIBRATED.out.vcf
+//    merged_recal_tbi     = GATK4_MERGEVCFS_RECALIBRATED.out.tbi
 }
