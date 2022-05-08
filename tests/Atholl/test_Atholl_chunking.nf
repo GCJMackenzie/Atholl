@@ -319,7 +319,7 @@ workflow test_joint_germ {
     //         'dbsnp,known=true,training=false,truth=false,prior=2.0 dbsnp_138.hg38.vcf'
     //     ]
     // ]
-    annotation            = ['AC', 'AF', 'AN']
+    annotation            = ['QD', 'MQ', 'FS', 'SOR']
     mode                  = 'SNP'
     truthsensitivity      = '99.0'
 
