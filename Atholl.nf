@@ -59,7 +59,52 @@ workflow ATHOLL {
 
     // panel_of_normals      = file(params.test_data['homo_sapiens']['genome']['mills_and_1000g_indels_21_vcf_gz'], checkIfExists: true)
     // panel_of_normals_tbi  = file(params.test_data['homo_sapiens']['genome']['mills_and_1000g_indels_21_vcf_gz_tbi'], checkIfExists: true)
-
+    
+    resources_SNP             = [
+       [
+           file('gs://genomics-public-data/resources/broad/hg38/v0/hapmap_3.3.hg38.vcf.gz', checkIfExists: true),
+           file('gs://genomics-public-data/resources/broad/hg38/v0/1000G_omni2.5.hg38.vcf.gz', checkIfExists: true),
+           file('gs://genomics-public-data/resources/broad/hg38/v0/1000G_phase1.snps.high_confidence.hg38.vcf.gz', checkIfExists: true),
+           file('gs://genomics-public-data/resources/broad/hg38/v0/Homo_sapiens_assembly38.dbsnp138.vcf', checkIfExists: true)
+        ],
+        [
+            file('gs://genomics-public-data/resources/broad/hg38/v0/hapmap_3.3.hg38.vcf.gz.tbi', checkIfExists: true),
+            file('gs://genomics-public-data/resources/broad/hg38/v0/1000G_omni2.5.hg38.vcf.gz.tbi', checkIfExists: true),
+            file('gs://genomics-public-data/resources/broad/hg38/v0/1000G_phase1.snps.high_confidence.hg38.vcf.gz.tbi', checkIfExists: true),
+            file('gs://genomics-public-data/resources/broad/hg38/v0/Homo_sapiens_assembly38.dbsnp138.vcf.idx', checkIfExists: true)
+        ],
+        [
+            'hapmap,known=false,training=true,truth=true,prior=15.0 hapmap_3.3.hg38.vcf.gz',
+            'omni,known=false,training=true,truth=false,prior=12.0 1000G_omni2.5.hg38.vcf.gz',
+            '1000G,known=false,training=true,truth=false,prior=10.0 1000G_phase1.snps.high_confidence.hg38.vcf.gz',
+            'dbsnp,known=true,training=false,truth=false,prior=2.0 Homo_sapiens_assembly38.dbsnp138.vcf'
+        ]
+    ]
+    
+    resources_INDEL             = [
+       [
+           file('gs://genomics-public-data/resources/broad/hg38/v0/hapmap_3.3.hg38.vcf.gz', checkIfExists: true),
+           file('gs://genomics-public-data/resources/broad/hg38/v0/1000G_omni2.5.hg38.vcf.gz', checkIfExists: true),
+           file('gs://genomics-public-data/resources/broad/hg38/v0/Mills_and_1000G_gold_standard.indels.hg38.vcf.gz', checkIfExists: true),
+           file('gs://genomics-public-data/resources/broad/hg38/v0/Homo_sapiens_assembly38.known_indels.vcf.gz', checkIfExists: true)
+        ],
+        [
+            file('gs://genomics-public-data/resources/broad/hg38/v0/hapmap_3.3.hg38.vcf.gz.tbi', checkIfExists: true),
+            file('gs://genomics-public-data/resources/broad/hg38/v0/1000G_omni2.5.hg38.vcf.gz.tbi', checkIfExists: true),
+            file('gs://genomics-public-data/resources/broad/hg38/v0/Mills_and_1000G_gold_standard.indels.hg38.vcf.gz.tbi', checkIfExists: true),
+            file('gs://genomics-public-data/resources/broad/hg38/v0/Homo_sapiens_assembly38.known_indels.vcf.gz.tbi', checkIfExists: true)
+        ],
+        [
+            'hapmap,known=false,training=true,truth=true,prior=15.0 hapmap_3.3.hg38.vcf.gz',
+            'omni,known=false,training=true,truth=false,prior=12.0 1000G_omni2.5.hg38.vcf.gz',
+            '1000G,known=false,training=true,truth=false,prior=10.0 Mills_and_1000G_gold_standard.indels.hg38.vcf.gz',
+            'dbsnp,known=true,training=false,truth=false,prior=2.0 Homo_sapiens_assembly38.known_indels.vcf.gz'
+        ]
+    ]
+    
+    annotation_SNP       = ['QD', 'MQ', 'FS', 'SOR']
+    annotation_INDEL       = ['QD', 'FS', 'SOR']
+    
     take:
 
     //universal args: these args are used by every subworkflow, input arg is used for passing in sample specific data, some of the array entries included are
@@ -86,9 +131,6 @@ workflow ATHOLL {
 
     // joint germline args: args exclusive to joint germline subworkflow
     allelespecific        // channel: true/false run allelespecific mode of vqsr modules
-    resources             // channel: [[resource, vcfs, forvariantrecal], [resource, tbis, forvariantrecal], [resource, labels, forvariantrecal]]
-    annotation            // channel: [annotations, to, use, for, variantrecal, filtering]
-    mode                  // channel: which mode to run variantrecal: SNP/INDEL/BOTH
     truthsensitivity      // channel: 0-100.0 truthsensitivity cutoff for applyvqsr
 
     main:
