@@ -18,8 +18,10 @@ workflow GATK_VQSR {
     fai              // channel: /path/to/reference/fasta/index
     dict             // channel: /path/to/reference/fasta/dictionary
     allelespecific   // channel: true/false run allelespecific mode of vqsr modules
-    resources        // channel: [[resource, vcfs, forvariantrecal], [resource, tbis, forvariantrecal], [resource, labels, forvariantrecal]]
-    annotation       // channel: [annotations, to, use, for, variantrecal, filtering]
+    resources_SNP        // channel: [[resource, vcfs, forvariantrecal], [resource, tbis, forvariantrecal], [resource, labels, forvariantrecal]]
+    resources_INDEL        // channel: [[resource, vcfs, forvariantrecal], [resource, tbis, forvariantrecal], [resource, labels, forvariantrecal]]
+    annotation_SNP       // channel: [annotations, to, use, for, variantrecal, filtering]
+    annotation_INDEL       // channel: [annotations, to, use, for, variantrecal, filtering]
     create_rscript   // channel: true/false whether to generate rscript plots in variantrecal
     truthsensitivity // channel: 0-100.0 truthsensitivity cutoff for applyvqsr
 
@@ -31,7 +33,7 @@ workflow GATK_VQSR {
     ch_versions   = ch_versions.mix(GATK4_SELECTVARIANTS_SNP.out.versions)
 
     ch_vrecal_snp_in = GATK4_SELECTVARIANTS_SNP.out.vcf.combine(GATK4_SELECTVARIANTS_SNP.out.tbi, by: 0)
-    GATK4_VARIANTRECALIBRATOR_SNP ( ch_vrecal_snp_in, fasta, fai, dict, allelespecific, resources, annotation, 'SNP', create_rscript )
+    GATK4_VARIANTRECALIBRATOR_SNP ( ch_vrecal_snp_in, fasta, fai, dict, allelespecific, resources_SNP, annotation_SNP, 'SNP', create_rscript )
     ch_versions   = ch_versions.mix(GATK4_VARIANTRECALIBRATOR_SNP.out.versions)
 
     ch_snp_recal      = GATK4_VARIANTRECALIBRATOR_SNP.out.recal
@@ -44,7 +46,7 @@ workflow GATK_VQSR {
     GATK4_SELECTVARIANTS_INDEL (ch_select_variants_in)
 
     ch_vrecal_indel_in = GATK4_SELECTVARIANTS_INDEL.out.vcf.combine(GATK4_SELECTVARIANTS_INDEL.out.tbi, by: 0)
-    GATK4_VARIANTRECALIBRATOR_INDEL ( ch_vrecal_indel_in, fasta, fai, dict, allelespecific, resources, annotation, 'INDEL', create_rscript )
+    GATK4_VARIANTRECALIBRATOR_INDEL ( ch_vrecal_indel_in, fasta, fai, dict, allelespecific, resources_INDEL, annotation_INDEL, 'INDEL', create_rscript )
 
     ch_indel_recal      = GATK4_VARIANTRECALIBRATOR_INDEL.out.recal
     ch_indel_idx        = GATK4_VARIANTRECALIBRATOR_INDEL.out.idx
@@ -54,8 +56,8 @@ workflow GATK_VQSR {
 
     GATK4_SELECTVARIANTS_NORECAL (ch_select_variants_in)
 
-//    ch_merge_recal_in = GATK4_SELECTVARIANTS_NORECAL.out.vcf.mix(GATK4_APPLYVQSR_SNP.out.vcf).mix(GATK4_APPLYVQSR_INDEL.out.vcf).groupTuple(by: 3)
-//    GATK4_MERGEVCFS_RECALIBRATED(ch_merge_recal_in, dict, true)
+    ch_merge_recal_in = GATK4_SELECTVARIANTS_NORECAL.out.vcf.mix(GATK4_APPLYVQSR_SNP.out.vcf).mix(GATK4_APPLYVQSR_INDEL.out.vcf).groupTuple(by: 3)
+    GATK4_MERGEVCFS_RECALIBRATED(ch_merge_recal_in, dict, true)
 
     emit:
     versions       = ch_versions                                     // channel: [ versions.yml ]
@@ -78,6 +80,6 @@ workflow GATK_VQSR {
     select_var_norecal_vcf     = GATK4_SELECTVARIANTS_NORECAL.out.vcf
     select_var_norecal_tbi     = GATK4_SELECTVARIANTS_NORECAL.out.tbi
 
-//    merged_recal_vcf     = GATK4_MERGEVCFS_RECALIBRATED.out.vcf
-//    merged_recal_tbi     = GATK4_MERGEVCFS_RECALIBRATED.out.tbi
+    merged_recal_vcf     = GATK4_MERGEVCFS_RECALIBRATED.out.vcf
+    merged_recal_tbi     = GATK4_MERGEVCFS_RECALIBRATED.out.tbi
 }
