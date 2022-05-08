@@ -278,26 +278,6 @@ workflow test_joint_germ {
     sort_order            = "coordinate"
 
     allelespecific        = false
-    resources             = [
-       [
-           file('gs://genomics-public-data/resources/broad/hg38/v0/hapmap_3.3.hg38.vcf.gz', checkIfExists: true),
-           file('gs://genomics-public-data/resources/broad/hg38/v0/1000G_omni2.5.hg38.vcf.gz', checkIfExists: true),
-           file('gs://genomics-public-data/resources/broad/hg38/v0/1000G_phase1.snps.high_confidence.hg38.vcf.gz', checkIfExists: true),
-           file('gs://genomics-public-data/resources/broad/hg38/v0/Homo_sapiens_assembly38.dbsnp138.vcf', checkIfExists: true)
-        ],
-        [
-            file('gs://genomics-public-data/resources/broad/hg38/v0/hapmap_3.3.hg38.vcf.gz.tbi', checkIfExists: true),
-            file('gs://genomics-public-data/resources/broad/hg38/v0/1000G_omni2.5.hg38.vcf.gz.tbi', checkIfExists: true),
-            file('gs://genomics-public-data/resources/broad/hg38/v0/1000G_phase1.snps.high_confidence.hg38.vcf.gz.tbi', checkIfExists: true),
-            file('gs://genomics-public-data/resources/broad/hg38/v0/Homo_sapiens_assembly38.dbsnp138.vcf.idx', checkIfExists: true)
-        ],
-        [
-            'hapmap,known=false,training=true,truth=true,prior=15.0 hapmap_3.3.hg38.vcf.gz',
-            'omni,known=false,training=true,truth=false,prior=12.0 1000G_omni2.5.hg38.vcf.gz',
-            '1000G,known=false,training=true,truth=false,prior=10.0 1000G_phase1.snps.high_confidence.hg38.vcf.gz',
-            'dbsnp,known=true,training=false,truth=false,prior=2.0 Homo_sapiens_assembly38.dbsnp138.vcf'
-        ]
-    ]
 
     // resources             = [
     //     [
@@ -319,9 +299,8 @@ workflow test_joint_germ {
     //         'dbsnp,known=true,training=false,truth=false,prior=2.0 dbsnp_138.hg38.vcf'
     //     ]
     // ]
-    annotation            = ['QD', 'MQ', 'FS', 'SOR']
     mode                  = 'SNP'
     truthsensitivity      = '99.0'
 
-    ATHOLL ( input, alignment, chunking, create_som_pon, joint_germline, tumor_somatic, tumor_normal_somatic, paired, joint_id, joint_intervals, is_ubam, sort_order, allelespecific, resources, annotation, mode, truthsensitivity )
+    ATHOLL ( input, alignment, chunking, create_som_pon, joint_germline, tumor_somatic, tumor_normal_somatic, paired, joint_id, joint_intervals, is_ubam, sort_order, allelespecific, truthsensitivity )
 }
