@@ -58,7 +58,7 @@ workflow test_gatk_vqsr {
     ]
     
     annotation_SNP       = ['QD', 'MQ', 'FS', 'SOR']
-    annotationINDEL       = ['QD', 'FS', 'SOR']
+    annotation_INDEL       = ['QD', 'FS', 'SOR']
     truthsensitivity = '99.0'
-    GATK_VQSR(ch_vqsr_in, fasta, fai, dict, allelespecific , resources_SNP , resources_INDEL , annotation_SNP , annotation_INDEL , false , truthsensitivity)
+    GATK_VQSR(input, fasta, fai, dict, allelespecific , resources_SNP , resources_INDEL , annotation_SNP , annotation_INDEL , false , truthsensitivity)
 }
