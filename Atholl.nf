@@ -13,6 +13,7 @@ include { GATK_VQSR} from './subworkflows/nf-core/gatk_vqsr/main'
 include { GATK_TUMOR_ONLY_SOMATIC_VARIANT_CALLING } from './subworkflows/nf-core/gatk_tumor_only_somatic_variant_calling/main'
 include { GATK_TUMOR_NORMAL_SOMATIC_VARIANT_CALLING } from './subworkflows/nf-core/gatk_tumor_normal_somatic_variant_calling/main'
 include { SAMTOOLS_MERGE } from './modules/samtools/merge/main'
+include { SAMTOOLS_INDEX_CHECKPOINT } from './modules/samtools/index/main'
 include { GATK4_MERGEVCFS } from './modules/gatk4/mergevcfs/main'
 include { BWAMEM2_INDEX } from './modules/bwamem2/index/main'
 
