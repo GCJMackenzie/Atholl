@@ -10,6 +10,7 @@ workflow test_fastq_to_recalbam {
     input                 = file('/home/gavin_mackenzie_nibsc_org/code/Atholl/tests/Atholl/test_align_to_mutect.csv', checkIfExists : true)
 
     alignment             = true
+    checkpoint            = true
     chunking              = false
     create_som_pon        = false
     joint_germline        = false
@@ -26,7 +27,7 @@ workflow test_fastq_to_recalbam {
     allelespecific        = []
     truthsensitivity      = []
 
-    ATHOLL ( input, alignment, chunking, create_som_pon, joint_germline, tumor_somatic, tumor_normal_somatic, paired, joint_id, joint_intervals, is_ubam, sort_order, allelespecific, truthsensitivity )
+    ATHOLL ( input, alignment, checkpoint, chunking, create_som_pon, joint_germline, tumor_somatic, tumor_normal_somatic, paired, joint_id, joint_intervals, is_ubam, sort_order, allelespecific, truthsensitivity )
 }
 
 workflow test_fastq_to_recalbam_multi {
