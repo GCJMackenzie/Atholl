@@ -152,7 +152,7 @@ workflow ATHOLL {
                 [bammeta, bam]
                 }.groupTuple(by: 0)
             SAMTOOLS_MERGE(merge_checkpoint, fasta)
-            SAMTOOLS_INDEX(SAMTOOLS_MERGE.out.bam)
+            SAMTOOLS_INDEX_CHECKPOINT(SAMTOOLS_MERGE.out.bam)
         }
     }
     
