@@ -9,42 +9,24 @@ workflow test_fastq_to_recalbam {
 
     input                 = file('/home/AD/gmackenz/Atholl/Atholl/tests/Atholl/test_align_infile.csv', checkIfExists : true)
 
-    fasta                 = file(params.test_data['homo_sapiens']['genome']['genome_fasta'], checkIfExists: true)
-    fai                   = file(params.test_data['homo_sapiens']['genome']['genome_fasta_fai'], checkIfExists: true)
-    dict                  = file(params.test_data['homo_sapiens']['genome']['genome_dict'], checkIfExists: true)
-
     alignment             = true
+    chunking              = false
     create_som_pon        = false
     joint_germline        = false
     tumor_somatic         = false
     tumor_normal_somatic  = false
     paired                = true
 
-    sites                 = file(params.test_data['homo_sapiens']['genome']['dbsnp_146_hg38_vcf_gz'], checkIfExists: true)
-    sites_index           = file(params.test_data['homo_sapiens']['genome']['dbsnp_146_hg38_vcf_gz_tbi'], checkIfExists: true)
-
     joint_id              = []
     joint_intervals       = file('/home/AD/gmackenz/Atholl/Atholl/tests/Atholl/test_shortened_intervals.bed', checkIfExists: true)
 
-    germline_resource     = []
-    germline_resource_tbi = []
-    panel_of_normals      = []
-    panel_of_normals_tbi  = []
-
-    BWAMEM2_INDEX( fasta )
-    bwaindex              = BWAMEM2_INDEX.out.index
     is_ubam               = false
     sort_order            = "coordinate"
 
-    run_haplotc           = true
-    run_vqsr              = true
     allelespecific        = []
-    resources             = []
-    annotation            = []
-    mode                  = []
     truthsensitivity      = []
 
-    ATHOLL ( input, fasta, fai, dict, alignment, create_som_pon, joint_germline, tumor_somatic, tumor_normal_somatic, paired, sites, sites_index, joint_id, joint_intervals, germline_resource, germline_resource_tbi, panel_of_normals, panel_of_normals_tbi, bwaindex, is_ubam, sort_order, run_haplotc, run_vqsr, allelespecific, resources, annotation, mode, truthsensitivity )
+    ATHOLL ( input, alignment, chunking, create_som_pon, joint_germline, tumor_somatic, tumor_normal_somatic, paired, joint_id, joint_intervals, is_ubam, sort_order, allelespecific, truthsensitivity )
 }
 
 workflow test_fastq_to_recalbam_multi {
