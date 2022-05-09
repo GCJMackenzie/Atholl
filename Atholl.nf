@@ -12,6 +12,7 @@ include { GATK_JOINT_GERMLINE_VARIANT_CALLING } from './subworkflows/nf-core/gat
 include { GATK_VQSR} from './subworkflows/nf-core/gatk_vqsr/main'
 include { GATK_TUMOR_ONLY_SOMATIC_VARIANT_CALLING } from './subworkflows/nf-core/gatk_tumor_only_somatic_variant_calling/main'
 include { GATK_TUMOR_NORMAL_SOMATIC_VARIANT_CALLING } from './subworkflows/nf-core/gatk_tumor_normal_somatic_variant_calling/main'
+include { SAMTOOLS_MERGE } from './modules/samtools/merge/main'
 include { GATK4_MERGEVCFS } from './modules/gatk4/mergevcfs/main'
 include { BWAMEM2_INDEX } from './modules/bwamem2/index/main'
 
@@ -113,6 +114,7 @@ workflow ATHOLL {
 
     //entry params: used to control which subworkflow(s) are run
     alignment
+    checkpoint
     chunking
     create_som_pon
     joint_germline
@@ -142,6 +144,15 @@ workflow ATHOLL {
         ch_chunk_in = GATK_ALIGN.out.sortsam_out.combine(GATK_ALIGN.out.samtools_index_out, by: 0)
         SAMTOOLS_CHUNK(ch_chunk_in, joint_intervals)
         GATK_PREPROCESS( SAMTOOLS_CHUNK.out.ch_format_out , fasta , fai , dict , sort_order, sites, sites_index )
+        if(checkpoint){
+            merge_checkpoint = GATK_PREPROCESS.out.applybqsr_out.map{ meta, bam -> 
+                def bammeta = [:]
+                bammeta.id = meta.sample
+                [bammeta, bam]
+                }.groupTuple(by: 0)
+            SAMTOOLS_MERGE(merge_checkpoint, fasta)
+            SAMTOOLS_INDEX(SAMTOOLS_MERGE.out.bam)
+        }
     }
     
     if (chunking) {
