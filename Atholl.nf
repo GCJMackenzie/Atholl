@@ -14,6 +14,7 @@ include { GATK_TUMOR_ONLY_SOMATIC_VARIANT_CALLING } from './subworkflows/nf-core
 include { GATK_TUMOR_NORMAL_SOMATIC_VARIANT_CALLING } from './subworkflows/nf-core/gatk_tumor_normal_somatic_variant_calling/main'
 include { SAMTOOLS_MERGE } from './modules/samtools/merge/main'
 include { SAMTOOLS_INDEX as SAMTOOLS_INDEX_CHECKPOINT } from './modules/samtools/index/main'
+include { SAMTOOLS_INDEX as SAMTOOLS_INDEX_MIDSTART } from './modules/samtools/index/main'
 include { GATK4_MERGEVCFS } from './modules/gatk4/mergevcfs/main'
 include { BWAMEM2_INDEX } from './modules/bwamem2/index/main'
 
@@ -117,6 +118,7 @@ workflow ATHOLL {
     alignment
     checkpoint
     chunking
+    start_calling
     create_som_pon
     joint_germline
     tumor_somatic
@@ -161,10 +163,23 @@ workflow ATHOLL {
         ch_chunk_in = filetest
         SAMTOOLS_CHUNK(ch_chunk_in, joint_intervals)
         GATK_PREPROCESS( SAMTOOLS_CHUNK.out.ch_format_out , fasta , fai , dict , sort_order, sites, sites_index )
+        prepro_bam        = GATK_PREPROCESS.out.applybqsr_out
+        prepro_index      = GATK_PREPROCESS.out.applybqsr_index_out
+        prepro_intervals  = GATK_PREPROCESS.out.ch_intervals_out
+    }
+    
+    if (start_calling) {
+        println("files specified as already preprocessed, start variant calling steps")
+        ch_chunk_in = filetest
+        SAMTOOLS_CHUNK(ch_chunk_in, joint_intervals)
+        SAMTOOLS_INDEX_MIDSTART(SAMTOOLS_CHUNK.out.ch_rg_bam_out)
+        prepro_bam       = SAMTOOLS_CHUNK.out.ch_rg_bam_out 
+        prepro_index     = SAMTOOLS_INDEX_MIDSTART.out.bai
+        prepro_intervals = SAMTOOLS_CHUNK.out.ch_interval_out 
     }
 
     if (create_som_pon) {
-        ch_mutect2_sub_in = GATK_PREPROCESS.out.applybqsr_out.combine(GATK_PREPROCESS.out.samtools_index_out, by: 0).combine(GATK_PREPROCESS.out.ch_intervals_out, by: 0).map{meta, bam, bai, intervals -> [meta, bam, bai, intervals, [] ]}
+        ch_mutect2_sub_in = prepro_bam.combine(prepro_index, by: 0).combine(prepro_intervals, by: 0).map{meta, bam, bai, intervals -> [meta, bam, bai, intervals, [] ]}
         GATK_MUTECT2_CALLING(ch_mutect2_sub_in, false, false, true, fasta, fai, dict, [], [], [], [])
         ch_som_pon_vcf =  GATK_MUTECT2_CALLING.out.mutect2_vcf.collect{it[1]}.toList()
         ch__som_pon_index =  GATK_MUTECT2_CALLING.out.mutect2_tbi.collect{it[1]}.toList()
@@ -173,7 +188,7 @@ workflow ATHOLL {
     }
 
     if (tumor_somatic) {
-        ch_mutect2_sub_in = GATK_PREPROCESS.out.applybqsr_out.combine(GATK_PREPROCESS.out.samtools_index_out, by: 0).combine(GATK_PREPROCESS.out.ch_intervals_out, by: 0).map{meta, bam, bai, intervals -> [meta, bam, bai, intervals, [] ]}
+        ch_mutect2_sub_in = prepro_bam.combine(prepro_index, by: 0).combine(prepro_intervals, by: 0).map{meta, bam, bai, intervals -> [meta, bam, bai, intervals, [] ]}
         GATK_MUTECT2_CALLING(ch_mutect2_sub_in, false, true, false, fasta, fai, dict, germline_resource, germline_resource_tbi, panel_of_normals, panel_of_normals_tbi)
         ch_tumor_only_in = GATK_PREPROCESS.out.applybqsr_out.combine(GATK_PREPROCESS.out.samtools_index_out, by: 0).combine(GATK_MUTECT2_CALLING.out.mutect2_vcf, by: 0).combine(GATK_MUTECT2_CALLING.out.mutect2_tbi, by: 0).combine(GATK_MUTECT2_CALLING.out.mutect2_stats, by: 0).combine(GATK_MUTECT2_CALLING.out.mutect2_intervals, by: 0)
         println("Performing tumor-only somatic variant calling")
@@ -192,7 +207,7 @@ workflow ATHOLL {
     }
 
     if (tumor_normal_somatic) {
-        if (alignment){ ch_mutect2_sub_in = GATK_PREPROCESS.out.applybqsr_out.combine(GATK_PREPROCESS.out.samtools_index_out, by: 0).combine(GATK_PREPROCESS.out.ch_intervals_out, by: 0)
+        if (alignment){ ch_mutect2_sub_in = prepro_bam.combine(prepro_index, by: 0).combine(prepro_intervals, by: 0)
         .map{meta, bam, bai, intervals ->
             [meta, meta.sample, bam, bai, intervals, meta.norms ]}.groupTuple(by:[1,4])
         .map{meta, sample_id, bam, bai, intervals, which_norms ->
@@ -206,7 +221,7 @@ workflow ATHOLL {
     if (joint_germline) {
         println("Performing joint germline variant calling")
 
-        ch_haplotc_sub_in = GATK_PREPROCESS.out.applybqsr_out.combine(GATK_PREPROCESS.out.applybqsr_index_out, by: 0).combine(GATK_PREPROCESS.out.ch_intervals_out, by: 0)
+        ch_haplotc_sub_in = prepro_bam.combine(prepro_index, by: 0).combine(prepro_intervals, by: 0)
         GATK_HAPLOTYPECALLING(ch_haplotc_sub_in, fasta, fai, dict, sites, sites_index)
 
         ch_haplo_out = GATK_HAPLOTYPECALLING.out.renamed_vcf.combine(GATK_HAPLOTYPECALLING.out.renamed_index, by: 0).combine(GATK_HAPLOTYPECALLING.out.haplotc_interval_out, by: 0).groupTuple(by: 3).map{meta, vcf, tbi, intervals ->
@@ -265,6 +280,17 @@ def extract_samples(csv_file, alignment, paired, chunking, create_som_pon, joint
                 [meta, file(row.input_file , checkIfExists : true), row.input_index, file(row.intervals , checkIfExists : true), row.which_norm ]
             }
         } else if (chunking) {
+            meta.single_end = "$row.single_end"
+            meta.rgID = "$row.rgID"
+            meta.rgLB = "$row.rgLB"
+            meta.rgPL = "$row.rgPL"
+            meta.rgPU = "$row.rgPU"
+            meta.rgSM = "$row.rgSM"
+            meta.read_group = "$row.readgroup"
+            println("aligned files")
+            [meta, file(row.input_file , checkIfExists : true), file(row.input_index, checkIfExists : true), row.intervals, row.which_norm ]
+        
+        } else if (start_calling) {
             meta.single_end = "$row.single_end"
             meta.rgID = "$row.rgID"
             meta.rgLB = "$row.rgLB"
