@@ -7,7 +7,7 @@ include { ATHOLL        } from '../../Atholl'
 
 workflow test_fastq_to_recalbam {
 
-    input                 = file('/home/AD/gmackenz/Atholl/Atholl/tests/Atholl/test_align_infile.csv', checkIfExists : true)
+    input                 = file('/home/gavin_mackenzie_nibsc_org/code/Atholl/tests/Atholl/test_align_infile.csv', checkIfExists : true)
 
     alignment             = true
     chunking              = false
@@ -18,7 +18,7 @@ workflow test_fastq_to_recalbam {
     paired                = true
 
     joint_id              = []
-    joint_intervals       = file('/home/AD/gmackenz/Atholl/Atholl/tests/Atholl/test_shortened_intervals.bed', checkIfExists: true)
+    joint_intervals       = file('/home/gavin_mackenzie_nibsc_org/code/Atholl/tests/Atholl/test_shortened_intervals.bed', checkIfExists: true)
 
     is_ubam               = false
     sort_order            = "coordinate"
