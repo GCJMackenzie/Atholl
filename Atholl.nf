@@ -156,6 +156,9 @@ workflow ATHOLL {
             SAMTOOLS_MERGE(merge_checkpoint, fasta)
             SAMTOOLS_INDEX_CHECKPOINT(SAMTOOLS_MERGE.out.bam)
         }
+        prepro_bam        = GATK_PREPROCESS.out.applybqsr_out
+        prepro_index      = GATK_PREPROCESS.out.applybqsr_index_out
+        prepro_intervals  = GATK_PREPROCESS.out.ch_intervals_out
     }
     
     if (chunking) {
