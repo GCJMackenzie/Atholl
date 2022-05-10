@@ -246,7 +246,9 @@ workflow test_joint_germ {
     // input           = file('/home/AD/gmackenz/Atholl/Atholl/tests/Atholl/test_long_germline.csv', checkIfExists : true)
 
     alignment             = false
-    chunking              = true
+    checkpoint            = false
+    chunking              = false
+    start_calling         = true
     create_som_pon        = false
     joint_germline        = true
     tumor_somatic         = false
@@ -286,5 +288,5 @@ workflow test_joint_germ {
     mode                  = 'SNP'
     truthsensitivity      = '99.0'
 
-    ATHOLL ( input, alignment, chunking, create_som_pon, joint_germline, tumor_somatic, tumor_normal_somatic, paired, joint_id, joint_intervals, is_ubam, sort_order, allelespecific, truthsensitivity )
+    ATHOLL ( input, alignment, checkpoint, chunking, start_calling, create_som_pon, joint_germline, tumor_somatic, tumor_normal_somatic, paired, joint_id, joint_intervals, is_ubam, sort_order, allelespecific, truthsensitivity )
 }
