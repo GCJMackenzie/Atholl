@@ -139,7 +139,7 @@ workflow ATHOLL {
     truthsensitivity      // channel: 0-100.0 truthsensitivity cutoff for applyvqsr
 
     main:
-        filetest = extract_samples(input, alignment, paired, chunking, create_som_pon, joint_germline, tumor_somatic, tumor_normal_somatic)
+        filetest = extract_samples(input, alignment, paired, chunking, start_calling, create_som_pon, joint_germline, tumor_somatic, tumor_normal_somatic)
 
     if (alignment) {
         println("The aligner is running")
@@ -258,7 +258,7 @@ workflow ATHOLL {
 
 }
 
-def extract_samples(csv_file, alignment, paired, chunking, create_som_pon, joint_germline, tumor_somatic, tumor_normal_somatic) {
+def extract_samples(csv_file, alignment, paired, chunking, start_calling, create_som_pon, joint_germline, tumor_somatic, tumor_normal_somatic) {
     firststep = Channel.from(csv_file).splitCsv(header: true).map{ row ->
         def meta = [:]
         meta.id = row.EntryID
