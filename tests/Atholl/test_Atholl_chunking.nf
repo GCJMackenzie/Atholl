@@ -10,7 +10,7 @@ workflow test_fastq_to_recalbam {
     input                 = file('/home/gavin_mackenzie_nibsc_org/code/Atholl/tests/Atholl/test_align_to_mutect.csv', checkIfExists : true)
 
     alignment             = true
-    checkpoint            = false
+    checkpoint            = true
     chunking              = false
     start_calling         = false
     create_som_pon        = false
