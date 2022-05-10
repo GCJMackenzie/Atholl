@@ -7,7 +7,7 @@ include { ATHOLL        } from '../../Atholl'
 
 workflow test_fastq_to_recalbam {
 
-    input                 = file('/home/gavin_mackenzie_nibsc_org/code/Atholl/tests/Atholl/test_long_chunk_germline.csv', checkIfExists : true)
+    input                 = file('/home/gavin_mackenzie_nibsc_org/code/Atholl/tests/Atholl/test_align_to_mutect.csv', checkIfExists : true)
 
     alignment             = true
     checkpoint            = false
