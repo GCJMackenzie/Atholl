@@ -320,7 +320,7 @@ def extract_samples(csv_file, alignment, paired, chunking, start_calling, create
             } else {
                 return [the_meta, input_files, intervals]
             }
-        } else if (chunking or start_calling) {
+        } else if (chunking || start_calling) {
             return [the_meta, input_files, input_indexes]
         } else if (joint_germline) {
             return [the_meta, input_files, input_indexes, intervals]
