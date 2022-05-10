@@ -9,15 +9,15 @@ workflow test_fastq_to_recalbam {
 
     input                 = file('/home/gavin_mackenzie_nibsc_org/code/Atholl/tests/Atholl/test_long_chunk_germline.csv', checkIfExists : true)
 
-    alignment             = false
+    alignment             = true
     checkpoint            = false
     chunking              = false
-    start_calling         = true
+    start_calling         = false
     create_som_pon        = false
     joint_germline        = false
     tumor_somatic         = true
     tumor_normal_somatic  = false
-    paired                = false
+    paired                = true
 
     joint_id              = []
     joint_intervals       = file('/home/gavin_mackenzie_nibsc_org/code/Atholl/tests/Atholl/test_shortened_intervals.bed', checkIfExists: true)
