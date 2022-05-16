@@ -2,5 +2,7 @@
 
 nextflow.enable.dsl = 2
 
-main:
-println(params.chunking)
+workflow DUMMY {
+  main:
+  println(params.chunking)
+}
