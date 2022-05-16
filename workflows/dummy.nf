@@ -4,10 +4,10 @@ nextflow.enable.dsl = 2
 
 workflow DUMMY {
   main:
-  println('input file: $params.input')
-  println(params.joint_intervals)
-  println(params.joint_id)
-  println(params.alignment)            
+  println("input file: $params.input")
+  println("intervals file: params.joint_intervals")
+  println("joint_id: params.joint_id ")
+  println("run alignment: ${params.alignment}")            
   println(params.checkpoint)           
   println(params.chunking)             
   println(params.start_calling)        
