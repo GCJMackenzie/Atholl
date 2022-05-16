@@ -2,21 +2,21 @@
 
 nextflow.enable.dsl = 2
 
-include { GATK_ALIGN } from './subworkflows/nf-core/gatk_align/main'
-include { SAMTOOLS_CHUNK } from './subworkflows/nf-core/samtools_chunking/main'
-include { GATK_PREPROCESS } from './subworkflows/nf-core/gatk_preprocess/main'
-include { GATK_MUTECT2_CALLING } from './subworkflows/nf-core/gatk_mutect2_calling/main'
-include { GATK_CREATE_SOMATIC_PON } from './subworkflows/nf-core/gatk_create_somatic_pon/main'
-include { GATK_HAPLOTYPECALLING} from './subworkflows/nf-core/gatk_haplotypecalling/main'
-include { GATK_JOINT_GERMLINE_VARIANT_CALLING } from './subworkflows/nf-core/gatk_joint_germline_variant_calling/main'
-include { GATK_VQSR} from './subworkflows/nf-core/gatk_vqsr/main'
-include { GATK_TUMOR_ONLY_SOMATIC_VARIANT_CALLING } from './subworkflows/nf-core/gatk_tumor_only_somatic_variant_calling/main'
-include { GATK_TUMOR_NORMAL_SOMATIC_VARIANT_CALLING } from './subworkflows/nf-core/gatk_tumor_normal_somatic_variant_calling/main'
-include { SAMTOOLS_MERGE } from './modules/samtools/merge/main'
-include { SAMTOOLS_INDEX as SAMTOOLS_INDEX_CHECKPOINT } from './modules/samtools/index/main'
-include { SAMTOOLS_INDEX as SAMTOOLS_INDEX_MIDSTART } from './modules/samtools/index/main'
-include { GATK4_MERGEVCFS } from './modules/gatk4/mergevcfs/main'
-include { BWAMEM2_INDEX } from './modules/bwamem2/index/main'
+include { GATK_ALIGN } from '../subworkflows/nf-core/gatk_align/main'
+include { SAMTOOLS_CHUNK } from '../subworkflows/nf-core/samtools_chunking/main'
+include { GATK_PREPROCESS } from '../subworkflows/nf-core/gatk_preprocess/main'
+include { GATK_MUTECT2_CALLING } from '../subworkflows/nf-core/gatk_mutect2_calling/main'
+include { GATK_CREATE_SOMATIC_PON } from '../subworkflows/nf-core/gatk_create_somatic_pon/main'
+include { GATK_HAPLOTYPECALLING} from '../subworkflows/nf-core/gatk_haplotypecalling/main'
+include { GATK_JOINT_GERMLINE_VARIANT_CALLING } from '../subworkflows/nf-core/gatk_joint_germline_variant_calling/main'
+include { GATK_VQSR} from '../subworkflows/nf-core/gatk_vqsr/main'
+include { GATK_TUMOR_ONLY_SOMATIC_VARIANT_CALLING } from '../subworkflows/nf-core/gatk_tumor_only_somatic_variant_calling/main'
+include { GATK_TUMOR_NORMAL_SOMATIC_VARIANT_CALLING } from '../subworkflows/nf-core/gatk_tumor_normal_somatic_variant_calling/main'
+include { SAMTOOLS_MERGE } from '../modules/samtools/merge/main'
+include { SAMTOOLS_INDEX as SAMTOOLS_INDEX_CHECKPOINT } from '../modules/samtools/index/main'
+include { SAMTOOLS_INDEX as SAMTOOLS_INDEX_MIDSTART } from '../modules/samtools/index/main'
+include { GATK4_MERGEVCFS } from '../modules/gatk4/mergevcfs/main'
+include { BWAMEM2_INDEX } from '../modules/bwamem2/index/main'
 
 workflow ATHOLL {
 
