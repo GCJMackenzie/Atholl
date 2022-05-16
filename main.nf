@@ -2,8 +2,8 @@
 nextflow.enable.dsl = 2
 
 // params for the input csv, intervals file used for splitting into chunks and the ID to be used for when samples are joined together
-params.input                 = file('/home/gavin_mackenzie_nibsc_org/code/Atholl/tests/Atholl/test_align_to_mutect.csv', checkIfExists : true)
-params.joint_intervals       = file('/home/gavin_mackenzie_nibsc_org/code/Atholl/tests/Atholl/test_shortened_intervals.bed', checkIfExists: true)
+params.input                 = '/home/gavin_mackenzie_nibsc_org/code/Atholl/tests/Atholl/test_align_to_mutect.csv'
+params.joint_intervals       = '/home/gavin_mackenzie_nibsc_org/code/Atholl/tests/Atholl/test_shortened_intervals.bed'
 params.joint_id              = "results_joint"
 
 // params deciding what Atholl runs and where to start the workflow.
