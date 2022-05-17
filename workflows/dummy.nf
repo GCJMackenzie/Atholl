@@ -23,6 +23,6 @@ workflow DUMMY {
   println("Output directory: $params.outdir")
   println("Publish directory mode: $params.publish_dir_mode")
   println("Enable conda: $params.enable_conda")
-  println("Genome build : $params.genome ")
-  println("igenomes path : $params.igenomes_base ")
+  println("Genome build : $genome ")
+  println("igenomes path : $igenomes_base ")
 }
