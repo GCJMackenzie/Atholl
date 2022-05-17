@@ -19,5 +19,8 @@ workflow DUMMY {
   println("Input file is a paired fastq file: $params.paired")             
   println("How Samtools sort will sort bam files: $params.sort_order")          
   println("Variant_Recalibrator files are allele specific: $params.allelespecific")      
-  println("Variant_Recalibrator will run with truth sensitivity set to: $params.truthsensitivity")    
+  println("Variant_Recalibrator will run with truth sensitivity set to: $params.truthsensitivity")
+  println("Output directory: $params.outdir")
+  println("Publish directory mode: $params.publish_dir_mode")
+  println("Enable conda: $params.enable_conda")
 }
