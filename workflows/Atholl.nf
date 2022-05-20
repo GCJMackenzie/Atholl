@@ -27,8 +27,8 @@ germline_resource     = file(params.genome.gnomad, checkIfExists: true)
 germline_resource_tbi = file(params.genome.gnomad_tbi, checkIfExists: true)
 sites                 = file(params.genome.dbsnp, checkIfExists: true)
 sites_index           = file(params.genome.dbsnp_tbi, checkIfExists: true)
-panel_of_normals      = file(params.genome.1000Gomni, checkIfExists: true)
-panel_of_normals_tbi  = file(params.genome.1000Gomni_tbi, checkIfExists: true)
+panel_of_normals      = file(params.genome.res_1000g_omni, checkIfExists: true)
+panel_of_normals_tbi  = file(params.genome.res_1000g_omni_tbi, checkIfExists: true)
 
 if ( params.bwamem2_index == '' ) {
     BWAMEM2_INDEX( fasta )
