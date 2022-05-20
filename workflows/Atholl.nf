@@ -239,6 +239,10 @@ if ( params.bwamem2_index == '' ) {
         println(sites_index)
         println(panel_of_normals)
         println(panel_of_normals_tbi)
+        println(resources_SNP)
+        println(resources_INDEL)
+        println(annotation_SNP)
+        println(annotation_INDEL)
         bwaindex.view()
     }
 
