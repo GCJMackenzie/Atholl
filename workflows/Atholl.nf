@@ -41,11 +41,6 @@ if ( params.bwamem2_index == '' ) {
     bwaindex = Channel.fromPath(params.bwamem2_index).collect()
     }
 
-    // BWAMEM2_INDEX( fasta )
-    // bwaindex = BWAMEM2_INDEX.out.index
-    // bwaindex = Channel.fromPath('gs://mhra-ngs-dev-0yzc-nextflow/bwamem2').collect()
-    // bwaindex              = Channel.fromPath('/home/AD/gmackenz/Atholl/bwamem2/genome.fasta.{amb,ann,bwt.2bit.64,pac,0123}').collect()
- 
     // resources_SNP             = [
     //    [
     //        file('gs://genomics-public-data/resources/broad/hg38/v0/hapmap_3.3.hg38.vcf.gz', checkIfExists: true),
