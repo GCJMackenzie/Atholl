@@ -29,8 +29,8 @@ sites                 = file(params.genome.dbsnp, checkIfExists: true)
 sites_index           = file(params.genome.dbsnp_tbi, checkIfExists: true)
 panel_of_normals      = file(params.genome.res_1000g_omni, checkIfExists: true)
 panel_of_normals_tbi  = file(params.genome.res_1000g_omni_tbi, checkIfExists: true)
-resources_SNP         = params.genome.resource_SNP 
-resources_INDEL       = params.genome.resource_INDEL 
+// resources_SNP         = params.genome.resource_SNP 
+// resources_INDEL       = params.genome.resource_INDEL 
 annotation_SNP        = params.genome.annotation_SNP 
 annotation_INDEL      = params.genome.annotation_INDEL 
 
@@ -239,8 +239,8 @@ if ( params.bwamem2_index == '' ) {
         println(sites_index)
         println(panel_of_normals)
         println(panel_of_normals_tbi)
-        println(resources_SNP)
-        println(resources_INDEL)
+        // println(resources_SNP)
+        // println(resources_INDEL)
         println(annotation_SNP)
         println(annotation_INDEL)
         bwaindex.view()
