@@ -29,6 +29,10 @@ sites                 = file(params.genome.dbsnp, checkIfExists: true)
 sites_index           = file(params.genome.dbsnp_tbi, checkIfExists: true)
 panel_of_normals      = file(params.genome.res_1000g_omni, checkIfExists: true)
 panel_of_normals_tbi  = file(params.genome.res_1000g_omni_tbi, checkIfExists: true)
+resources_SNP         = params.genome.resource_SNP 
+resources_INDEL       = params.genome.resource_INDEL 
+annotation_SNP        = params.genome.annotation_SNP 
+annotation_INDEL      = params.genome.annotation_INDEL 
 
 if ( params.bwamem2_index == '' ) {
     BWAMEM2_INDEX( fasta )
@@ -41,13 +45,7 @@ if ( params.bwamem2_index == '' ) {
     // bwaindex = BWAMEM2_INDEX.out.index
     // bwaindex = Channel.fromPath('gs://mhra-ngs-dev-0yzc-nextflow/bwamem2').collect()
     // bwaindex              = Channel.fromPath('/home/AD/gmackenz/Atholl/bwamem2/genome.fasta.{amb,ann,bwt.2bit.64,pac,0123}').collect()
-
-    // panel_of_normals      = file('gs://genomics-public-data/resources/broad/hg38/v0/Mills_and_1000G_gold_standard.indels.hg38.vcf.gz', checkIfExists: true)
-    // panel_of_normals_tbi  = file('gs://genomics-public-data/resources/broad/hg38/v0/Mills_and_1000G_gold_standard.indels.hg38.vcf.gz.tbi', checkIfExists: true)
-
-    // panel_of_normals      = file(params.test_data['homo_sapiens']['genome']['mills_and_1000g_indels_21_vcf_gz'], checkIfExists: true)
-    // panel_of_normals_tbi  = file(params.test_data['homo_sapiens']['genome']['mills_and_1000g_indels_21_vcf_gz_tbi'], checkIfExists: true)
-    
+ 
     // resources_SNP             = [
     //    [
     //        file('gs://genomics-public-data/resources/broad/hg38/v0/hapmap_3.3.hg38.vcf.gz', checkIfExists: true),
@@ -90,8 +88,6 @@ if ( params.bwamem2_index == '' ) {
     //    ]
     // ]
     
-    annotation_SNP       = ['QD', 'MQ', 'FS', 'SOR']
-    annotation_INDEL       = ['QD', 'FS', 'SOR']
     
     //universal args: these args are used by every subworkflow, input arg is used for passing in sample specific data, some of the array entries included are
     //not necessary for everysubworkflow, e.g which_norm, these are only passed in to the subworkflows that require them.
