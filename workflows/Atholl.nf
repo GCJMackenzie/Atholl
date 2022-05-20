@@ -38,7 +38,7 @@ if ( params.bwamem2_index == '' ) {
     BWAMEM2_INDEX( fasta )
     bwaindex = BWAMEM2_INDEX.out.index
     } else {
-    bwaindex = Channel.fromPath('params.bwamem2_index.{amb,ann,bwt.2bit.64,pac,0123}').collect()
+    bwaindex = Channel.fromPath('${params.bwamem2_index}.{amb,ann,bwt.2bit.64,pac,0123}').collect()
     }
 
     // BWAMEM2_INDEX( fasta )
