@@ -20,9 +20,9 @@ include { BWAMEM2_INDEX } from '../modules/bwamem2/index/main'
 
 workflow ATHOLL {
 
-fasta                 = params.genome.fasta
-fai                   = params.genome.fai
-dict                  = params.genome.dict
+fasta                 = file(params.genome.fasta, checkIfExists: true)
+fai                   = file(params.genome.fai, checkIfExists: true)
+dict                  = file(params.genome.dict, checkIfExists: true)
 
 //    bwaindex              = params.genomes.'GATK.GRCh38'.bwa
 
