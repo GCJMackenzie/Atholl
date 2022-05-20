@@ -20,9 +20,9 @@ include { BWAMEM2_INDEX } from '../modules/bwamem2/index/main'
 
 workflow ATHOLL {
 
-//    fasta                 = params.genomes.'GATK.GRCh38'.fasta
-//    fai                   = params.genomes.'GATK.GRCh38'.fasta_fai
-//    dict                  = params.genomes.'GATK.GRCh38'.dict
+fasta                 = params.genome.fasta
+fai                   = params.genome.fai
+dict                  = params.genome.dict
 
 //    bwaindex              = params.genomes.'GATK.GRCh38'.bwa
 
@@ -36,9 +36,9 @@ workflow ATHOLL {
     // fai                   = file('gs://genomics-public-data/resources/broad/hg38/v0/Homo_sapiens_assembly38.fasta.fai', checkIfExists: true)
     // dict                  = file('gs://genomics-public-data/resources/broad/hg38/v0/Homo_sapiens_assembly38.dict', checkIfExists: true)
 
-    fasta                 = file(params.test_data['homo_sapiens']['genome']['genome_21_fasta'], checkIfExists: true)
-    fai                   = file(params.test_data['homo_sapiens']['genome']['genome_21_fasta_fai'], checkIfExists: true)
-    dict                  = file(params.test_data['homo_sapiens']['genome']['genome_21_dict'], checkIfExists: true)
+    // fasta                 = file(params.test_data['homo_sapiens']['genome']['genome_21_fasta'], checkIfExists: true)
+    // fai                   = file(params.test_data['homo_sapiens']['genome']['genome_21_fasta_fai'], checkIfExists: true)
+    // dict                  = file(params.test_data['homo_sapiens']['genome']['genome_21_dict'], checkIfExists: true)
 
     BWAMEM2_INDEX( fasta )
     bwaindex = BWAMEM2_INDEX.out.index
