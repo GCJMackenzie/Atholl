@@ -23,6 +23,8 @@ workflow ATHOLL {
 fasta                 = file(params.genome.fasta, checkIfExists: true)
 fai                   = file(params.genome.fai, checkIfExists: true)
 dict                  = file(params.genome.dict, checkIfExists: true)
+germline_resource     = file(params.genome.germline_resource, checkIfExists: true)
+germline_resource_tbi = file(params.genome.germline_resource_tbi, checkIfExists: true)
 
 if ( params.bwamem2_index == '' ) {
     BWAMEM2_INDEX( fasta )
@@ -250,10 +252,11 @@ if ( params.bwamem2_index == '' ) {
         println(fasta)
         println(fai)
         println(dict)
+        println(germline_resource)
+        println(germline_resource_tbi)
         // println(sites)
         // println(sites_index)
         bwaindex.view()
-        sleep(30)
     }
 
 }
