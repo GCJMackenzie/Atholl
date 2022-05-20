@@ -25,10 +25,10 @@ params.sort_order            = "coordinate"
 params.allelespecific        = false
 params.truthsensitivity      = 99.0
 
-// include { ATHOLL } from './workflows/Atholl'
+include { ATHOLL } from './workflows/Atholl'
 include { DUMMY } from './workflows/dummy'
 
 workflow {
-    // ATHOLL ()
-    DUMMY ()
+    ATHOLL ()
+    // DUMMY ()
 }
