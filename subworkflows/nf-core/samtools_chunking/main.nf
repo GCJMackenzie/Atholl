@@ -51,9 +51,9 @@ workflow SAMTOOLS_CHUNK {
 
     emit:
     ch_format_out   = ch_reformmatted
-    ch_bam_out      = SAMTOOLS_VIEW.out.bam // channel: [ file.bam ]
+    // ch_bam_out      = SAMTOOLS_VIEW.out.bam // channel: [ file.bam ]
     ch_rg_bam_out = PICARD_ADDORREPLACEREADGROUPS.out.bam
-    ch_index_out    = ch_indexes            // channel: [ file.bai ]
+    // ch_index_out    = ch_indexes            // channel: [ file.bai ]
     ch_interval_out = ch_intervals          // channel: [ interval_string ]
     versions        = ch_versions           // channel: [ versions.yml ]
 
