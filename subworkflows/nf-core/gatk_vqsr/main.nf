@@ -61,24 +61,24 @@ workflow GATK_VQSR {
 
     emit:
     versions       = ch_versions                                     // channel: [ versions.yml ]
-    select_var_snp_vcf     = GATK4_SELECTVARIANTS_SNP.out.vcf
-    select_var_snp_tbi     = GATK4_SELECTVARIANTS_SNP.out.tbi
-    recal_snp_file     = GATK4_VARIANTRECALIBRATOR_SNP.out.recal // channel: [ val(meta), [ recal ] ]
-    recal_snp_index    = GATK4_VARIANTRECALIBRATOR_SNP.out.idx   // channel: [ val(meta), [ idx ] ]
-    recal_snp_tranches = GATK4_VARIANTRECALIBRATOR_SNP.out.tranches // channel: [ val(meta), [ tranches ] ]
-    vqsr_snp_vcf       = GATK4_APPLYVQSR_SNP.out.vcf             // channel: [ val(meta), [ vcf ] ]
-    vqsr_snp_index     = GATK4_APPLYVQSR_SNP.out.tbi             // channel: [ val(meta), [ tbi ] ]
+    // select_var_snp_vcf     = GATK4_SELECTVARIANTS_SNP.out.vcf
+    // select_var_snp_tbi     = GATK4_SELECTVARIANTS_SNP.out.tbi
+    // recal_snp_file     = GATK4_VARIANTRECALIBRATOR_SNP.out.recal // channel: [ val(meta), [ recal ] ]
+    // recal_snp_index    = GATK4_VARIANTRECALIBRATOR_SNP.out.idx   // channel: [ val(meta), [ idx ] ]
+    // recal_snp_tranches = GATK4_VARIANTRECALIBRATOR_SNP.out.tranches // channel: [ val(meta), [ tranches ] ]
+    // vqsr_snp_vcf       = GATK4_APPLYVQSR_SNP.out.vcf             // channel: [ val(meta), [ vcf ] ]
+    // vqsr_snp_index     = GATK4_APPLYVQSR_SNP.out.tbi             // channel: [ val(meta), [ tbi ] ]
 
-    select_var_indel_vcf     = GATK4_SELECTVARIANTS_INDEL.out.vcf
-    select_var_indel_tbi     = GATK4_SELECTVARIANTS_INDEL.out.tbi
-    recal_indel_file     = GATK4_VARIANTRECALIBRATOR_INDEL.out.recal // channel: [ val(meta), [ recal ] ]
-    recal_indel_index    = GATK4_VARIANTRECALIBRATOR_INDEL.out.idx   // channel: [ val(meta), [ idx ] ]
-    recal_indel_tranches = GATK4_VARIANTRECALIBRATOR_INDEL.out.tranches // channel: [ val(meta), [ tranches ] ]
-    vqsr_indel_vcf       = GATK4_APPLYVQSR_INDEL.out.vcf             // channel: [ val(meta), [ vcf ] ]
-    vqsr_indel_index     = GATK4_APPLYVQSR_INDEL.out.tbi             // channel: [ val(meta), [ tbi ] ]
+    // select_var_indel_vcf     = GATK4_SELECTVARIANTS_INDEL.out.vcf
+    // select_var_indel_tbi     = GATK4_SELECTVARIANTS_INDEL.out.tbi
+    // recal_indel_file     = GATK4_VARIANTRECALIBRATOR_INDEL.out.recal // channel: [ val(meta), [ recal ] ]
+    // recal_indel_index    = GATK4_VARIANTRECALIBRATOR_INDEL.out.idx   // channel: [ val(meta), [ idx ] ]
+    // recal_indel_tranches = GATK4_VARIANTRECALIBRATOR_INDEL.out.tranches // channel: [ val(meta), [ tranches ] ]
+    // vqsr_indel_vcf       = GATK4_APPLYVQSR_INDEL.out.vcf             // channel: [ val(meta), [ vcf ] ]
+    // vqsr_indel_index     = GATK4_APPLYVQSR_INDEL.out.tbi             // channel: [ val(meta), [ tbi ] ]
 
-    select_var_norecal_vcf     = GATK4_SELECTVARIANTS_NORECAL.out.vcf
-    select_var_norecal_tbi     = GATK4_SELECTVARIANTS_NORECAL.out.tbi
+    // select_var_norecal_vcf     = GATK4_SELECTVARIANTS_NORECAL.out.vcf
+    // select_var_norecal_tbi     = GATK4_SELECTVARIANTS_NORECAL.out.tbi
 
     merged_recal_vcf     = GATK4_MERGEVCFS_RECALIBRATED.out.vcf
     merged_recal_tbi     = GATK4_MERGEVCFS_RECALIBRATED.out.tbi
