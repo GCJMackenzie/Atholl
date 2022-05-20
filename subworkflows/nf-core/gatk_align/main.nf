@@ -97,11 +97,11 @@ workflow GATK_ALIGN {
 
     emit:
     versions                = ch_versions                                       // channel: [ versions.yml ]
-    intervals_out           = ch_intervals                                      // channel: [ val(meta), [intervals]]
-    bwa_mem_out             = BWAMEM2_MEM.out.bam                               // channel: [ val(meta), [ bam ] ]
+    // intervals_out           = ch_intervals                                      // channel: [ val(meta), [intervals]]
+    // bwa_mem_out             = BWAMEM2_MEM.out.bam                               // channel: [ val(meta), [ bam ] ]
     samtools_index_out      = SAMTOOLS_INDEX.out.bai                            // channel: [ val(meta), [ bai ] ]
     sortsam_out = PICARD_SORTSAM_ALIGNED.out.bam                                // channel: [ val(meta), [ bam ] ]
-    sortsam_unmapped_out    = is_ubam ? PICARD_SORTSAM_UNMAPPED.out.bam  : []   // channel: [ val(meta), [ bam ] ]
-    merge_bam_out           = is_ubam ? GATK4_MERGEBAMALIGNMENT.out.bam  : []   // channel: [ val(meta), [ bam ] ]
-    fastq_out               = is_ubam ? SAMTOOLS_FASTQ.out.fastq         : []   // channel: [ val(meta), [ fastq ] ]
+    // sortsam_unmapped_out    = is_ubam ? PICARD_SORTSAM_UNMAPPED.out.bam  : []   // channel: [ val(meta), [ bam ] ]
+    // merge_bam_out           = is_ubam ? GATK4_MERGEBAMALIGNMENT.out.bam  : []   // channel: [ val(meta), [ bam ] ]
+    // fastq_out               = is_ubam ? SAMTOOLS_FASTQ.out.fastq         : []   // channel: [ val(meta), [ fastq ] ]
 }
