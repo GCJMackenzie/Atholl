@@ -24,7 +24,12 @@ fasta                 = file(params.genome.fasta, checkIfExists: true)
 fai                   = file(params.genome.fai, checkIfExists: true)
 dict                  = file(params.genome.dict, checkIfExists: true)
 
-//    bwaindex              = params.genomes.'GATK.GRCh38'.bwa
+if ( params.bwamem2_index == '' ) {
+    BWAMEM2_INDEX( fasta )
+    bwaindex = BWAMEM2_INDEX.out.index
+    } else {
+    bwaindex = Channel.fromPath('params.bwamem2_index.{amb,ann,bwt.2bit.64,pac,0123}').collect()
+    }
 
 //    germline_resource     = params.genomes.'GATK.GRCh38'.germline_resource
 //    germline_resource_tbi = params.genomes.'GATK.GRCh38'.germline_resource_tbi
@@ -32,13 +37,6 @@ dict                  = file(params.genome.dict, checkIfExists: true)
 //    sites                 = params.genomes.'GATK.GRCh38'.dbsnp
 //    sites_index           = params.genomes.'GATK.GRCh38'.dbsnp_tbi
 
-    // fasta                 = file('gs://genomics-public-data/resources/broad/hg38/v0/Homo_sapiens_assembly38.fasta', checkIfExists: true)
-    // fai                   = file('gs://genomics-public-data/resources/broad/hg38/v0/Homo_sapiens_assembly38.fasta.fai', checkIfExists: true)
-    // dict                  = file('gs://genomics-public-data/resources/broad/hg38/v0/Homo_sapiens_assembly38.dict', checkIfExists: true)
-
-    // fasta                 = file(params.test_data['homo_sapiens']['genome']['genome_21_fasta'], checkIfExists: true)
-    // fai                   = file(params.test_data['homo_sapiens']['genome']['genome_21_fasta_fai'], checkIfExists: true)
-    // dict                  = file(params.test_data['homo_sapiens']['genome']['genome_21_dict'], checkIfExists: true)
 
     // BWAMEM2_INDEX( fasta )
     // bwaindex = BWAMEM2_INDEX.out.index
@@ -252,8 +250,8 @@ dict                  = file(params.genome.dict, checkIfExists: true)
         println(fasta)
         println(fai)
         println(dict)
-        println(sites)
-        println(sites_index)
+        // println(sites)
+        // println(sites_index)
         println(bwaindex)
     }
 
