@@ -35,8 +35,8 @@ workflow GATK_HAPLOTYPECALLING {
 
     emit:
     versions       = ch_versions                      // channel: [ versions.yml ]
-    haplotc_vcf    = GATK4_HAPLOTYPECALLER.out.vcf    // channel: [ val(meta), [ vcf ] ]
-    haplotc_index  = GATK4_HAPLOTYPECALLER.out.tbi    // channel: [ val(meta), [ tbi ] ]
+    // haplotc_vcf    = GATK4_HAPLOTYPECALLER.out.vcf    // channel: [ val(meta), [ vcf ] ]
+    // haplotc_index  = GATK4_HAPLOTYPECALLER.out.tbi    // channel: [ val(meta), [ tbi ] ]
     renamed_vcf    = PICARD_RENAMESAMPLEINVCF.out.vcf    // channel: [ val(meta), [ vcf ] ]
     renamed_index  = GATK4_INDEXFEATUREFILE.out.index    // channel: [ val(meta), [ tbi ] ]
     haplotc_interval_out = haplotc_intervals
