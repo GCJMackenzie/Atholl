@@ -253,6 +253,7 @@ if ( params.bwamem2_index == '' ) {
         // println(sites)
         // println(sites_index)
         bwaindex.view()
+        sleep(30)
     }
 
 }
