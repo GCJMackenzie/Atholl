@@ -23,8 +23,12 @@ workflow ATHOLL {
 fasta                 = file(params.genome.fasta, checkIfExists: true)
 fai                   = file(params.genome.fai, checkIfExists: true)
 dict                  = file(params.genome.dict, checkIfExists: true)
-germline_resource     = file(params.genome.germline_resource, checkIfExists: true)
-germline_resource_tbi = file(params.genome.germline_resource_tbi, checkIfExists: true)
+germline_resource     = file(params.genome.gnomad, checkIfExists: true)
+germline_resource_tbi = file(params.genome.gnomad_tbi, checkIfExists: true)
+sites                 = file(params.genome.dbsnp, checkIfExists: true)
+sites_index           = file(params.genome.dbsnp_tbi, checkIfExists: true)
+panel_of_normals      = file(params.genome.1000g_omni, checkIfExists: true)
+panel_of_normals_tbi  = file(params.genome.1000g_omni_tbi, checkIfExists: true)
 
 if ( params.bwamem2_index == '' ) {
     BWAMEM2_INDEX( fasta )
@@ -33,32 +37,13 @@ if ( params.bwamem2_index == '' ) {
     bwaindex = Channel.fromPath('params.bwamem2_index.{amb,ann,bwt.2bit.64,pac,0123}').collect()
     }
 
-//    germline_resource     = params.genomes.'GATK.GRCh38'.germline_resource
-//    germline_resource_tbi = params.genomes.'GATK.GRCh38'.germline_resource_tbi
-
-//    sites                 = params.genomes.'GATK.GRCh38'.dbsnp
-//    sites_index           = params.genomes.'GATK.GRCh38'.dbsnp_tbi
-
-
     // BWAMEM2_INDEX( fasta )
     // bwaindex = BWAMEM2_INDEX.out.index
     // bwaindex = Channel.fromPath('gs://mhra-ngs-dev-0yzc-nextflow/bwamem2').collect()
     // bwaindex              = Channel.fromPath('/home/AD/gmackenz/Atholl/bwamem2/genome.fasta.{amb,ann,bwt.2bit.64,pac,0123}').collect()
 
-    // germline_resource     = file('gs://genomics-public-data/resources/broad/hg38/v0/Homo_sapiens_assembly38.known_indels.vcf.gz', checkIfExists: true)
-    // germline_resource_tbi = file('gs://genomics-public-data/resources/broad/hg38/v0/Homo_sapiens_assembly38.known_indels.vcf.gz', checkIfExists: true)
-
-    // sites                 = file('gs://genomics-public-data/resources/broad/hg38/v0/Homo_sapiens_assembly38.dbsnp138.vcf', checkIfExists: true)
-    // sites_index           = file('gs://genomics-public-data/resources/broad/hg38/v0/Homo_sapiens_assembly38.dbsnp138.vcf.idx', checkIfExists: true)
-
     // panel_of_normals      = file('gs://genomics-public-data/resources/broad/hg38/v0/Mills_and_1000G_gold_standard.indels.hg38.vcf.gz', checkIfExists: true)
     // panel_of_normals_tbi  = file('gs://genomics-public-data/resources/broad/hg38/v0/Mills_and_1000G_gold_standard.indels.hg38.vcf.gz.tbi', checkIfExists: true)
-
-    // germline_resource     = file(params.test_data['homo_sapiens']['genome']['gnomad_r2_1_1_21_vcf_gz'], checkIfExists: true)
-    // germline_resource_tbi = file(params.test_data['homo_sapiens']['genome']['gnomad_r2_1_1_21_vcf_gz_tbi'], checkIfExists: true)
-
-    // sites                 = file(params.test_data['homo_sapiens']['genome']['dbsnp_138_hg38_21_vcf_gz'], checkIfExists: true)
-    // sites_index           = file(params.test_data['homo_sapiens']['genome']['dbsnp_138_hg38_21_vcf_gz_tbi'], checkIfExists: true)
 
     // panel_of_normals      = file(params.test_data['homo_sapiens']['genome']['mills_and_1000g_indels_21_vcf_gz'], checkIfExists: true)
     // panel_of_normals_tbi  = file(params.test_data['homo_sapiens']['genome']['mills_and_1000g_indels_21_vcf_gz_tbi'], checkIfExists: true)
@@ -254,8 +239,10 @@ if ( params.bwamem2_index == '' ) {
         println(dict)
         println(germline_resource)
         println(germline_resource_tbi)
-        // println(sites)
-        // println(sites_index)
+        println(sites)
+        println(sites_index)
+        println(panel_of_normals)
+        println(panel_of_normals_tbi)
         bwaindex.view()
     }
 
