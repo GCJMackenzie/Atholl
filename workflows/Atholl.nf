@@ -91,7 +91,9 @@ if ( params.bwamem2_index == '' ) {
     
     //universal args: these args are used by every subworkflow, input arg is used for passing in sample specific data, some of the array entries included are
     //not necessary for everysubworkflow, e.g which_norm, these are only passed in to the subworkflows that require them.
-    input = params.input
+    input           = file( params.input, checkIfExists: true)
+    joint_intervals = file( params.joint_intervals, checkIfExists: true) 
+    joint_id        = params.joint_id 
 
     //entry params: used to control which subworkflow(s) are run
     alignment = params.alignment
@@ -105,9 +107,6 @@ if ( params.bwamem2_index == '' ) {
     paired = params.paired
 
     //shared args: these args are used by two or more subworkflows, but are not universal, which subworkflows use them are noted.
-
-    joint_id          = params.joint_id    // channel: joint id for gendbs and pons    joint germline + create_som_pon
-    joint_intervals   = params.joint_intervals     // channel: joint intervals file            joint germline + create_som_pon
 
     // aligner args: args exclusive to align and preprocess subworkflow
     is_ubam           = params.is_ubam    // channel: true/false whether input is in ubam format or not
