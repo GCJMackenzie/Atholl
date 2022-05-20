@@ -262,11 +262,11 @@ def extract_samples(csv_file, alignment, paired, chunking, start_calling, create
             meta.read_group = "$row.readgroup"
             if (paired) {
                 println("paired end data")
-                [meta, [ file(row.input_file , checkIfExists : true), file(row.paired_file_2 , checkIfExists : true) ], row.input_index, file(row.intervals , checkIfExists : true), row.which_norm ]
+                [meta, [ file(row.input_file , checkIfExists : true), file(row.paired_file_2 , checkIfExists : true) ], row.input_index, row.intervals, row.which_norm ]
 
             } else {
                 println("interleaved or ubam")
-                [meta, file(row.input_file , checkIfExists : true), row.input_index, file(row.intervals , checkIfExists : true), row.which_norm ]
+                [meta, file(row.input_file , checkIfExists : true), row.input_index, row.intervals, row.which_norm ]
             }
         } else if (chunking) {
             meta.single_end = "$row.single_end"
@@ -295,7 +295,7 @@ def extract_samples(csv_file, alignment, paired, chunking, start_calling, create
             [meta, file(row.input_file , checkIfExists : true), file(row.input_index , checkIfExists : true), row.intervals, row.which_norm ]
         } else {
             println("variant calling")
-            [meta, file(row.input_file , checkIfExists : true), file(row.input_index , checkIfExists : true), file(row.intervals , checkIfExists : true), row.which_norm ]
+            [meta, file(row.input_file , checkIfExists : true), file(row.input_index , checkIfExists : true), row.intervals, row.which_norm ]
         }
     }.groupTuple().map { meta, input_file, input_index, intervals_file, which_norm ->
         def the_meta = meta.clone()
