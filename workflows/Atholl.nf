@@ -108,35 +108,33 @@ dict                  = params.genome.dict
     annotation_SNP       = ['QD', 'MQ', 'FS', 'SOR']
     annotation_INDEL       = ['QD', 'FS', 'SOR']
     
-    take:
-
     //universal args: these args are used by every subworkflow, input arg is used for passing in sample specific data, some of the array entries included are
     //not necessary for everysubworkflow, e.g which_norm, these are only passed in to the subworkflows that require them.
-    input
+    input = params.input
 
     //entry params: used to control which subworkflow(s) are run
-    alignment
-    checkpoint
-    chunking
-    start_calling
-    create_som_pon
-    joint_germline
-    tumor_somatic
-    tumor_normal_somatic
-    paired
+    alignment = params.alignment
+    checkpoint = params.checkpoint
+    chunking = params.chunking
+    start_calling = params.start_calling
+    create_som_pon = params.create_som_pon
+    joint_germline = params.joint_germline
+    tumor_somatic = params.tumor_somatic
+    tumor_normal_somatic = params.tumor_normal_somatic
+    paired = params.paired
 
     //shared args: these args are used by two or more subworkflows, but are not universal, which subworkflows use them are noted.
 
-    joint_id              // channel: joint id for gendbs and pons    joint germline + create_som_pon
-    joint_intervals       // channel: joint intervals file            joint germline + create_som_pon
+    joint_id          = params.joint_id    // channel: joint id for gendbs and pons    joint germline + create_som_pon
+    joint_intervals   = params.joint_intervals     // channel: joint intervals file            joint germline + create_som_pon
 
     // aligner args: args exclusive to align and preprocess subworkflow
-    is_ubam               // channel: true/false whether input is in ubam format or not
-    sort_order            // channel: which sort order to use for PICARD_SORTSAM_DUPLICATESMARKED
+    is_ubam           = params.is_ubam    // channel: true/false whether input is in ubam format or not
+    sort_order        = params.sort_order    // channel: which sort order to use for PICARD_SORTSAM_DUPLICATESMARKED
 
     // joint germline args: args exclusive to joint germline subworkflow
-    allelespecific        // channel: true/false run allelespecific mode of vqsr modules
-    truthsensitivity      // channel: 0-100.0 truthsensitivity cutoff for applyvqsr
+    allelespecific    = params.allelespecific    // channel: true/false run allelespecific mode of vqsr modules
+    truthsensitivity  = params.truthsensitivity    // channel: 0-100.0 truthsensitivity cutoff for applyvqsr
 
     main:
         filetest = extract_samples(input, alignment, paired, chunking, start_calling, create_som_pon, joint_germline, tumor_somatic, tumor_normal_somatic)
