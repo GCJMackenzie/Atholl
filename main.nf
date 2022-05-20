@@ -21,6 +21,7 @@ params.is_ubam               = false
 params.paired                = true
 
 //Params related to other settings. The sort order for sorting bam files by, whether variantrecalibrator is allelespecific or not, the truth sensitivity for variant recalibrator.
+params.bwamem2_index         = ''
 params.sort_order            = "coordinate"
 params.allelespecific        = false
 params.truthsensitivity      = 99.0
