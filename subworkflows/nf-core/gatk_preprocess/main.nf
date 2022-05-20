@@ -78,12 +78,12 @@ workflow GATK_PREPROCESS {
 
     emit:
     versions                = ch_versions                                       // channel: [ versions.yml ]
-    markdup_out             = PICARD_MARKDUPLICATES.out.bam                     // channel: [ val(meta), [ bam ] ]
+    // markdup_out             = PICARD_MARKDUPLICATES.out.bam                     // channel: [ val(meta), [ bam ] ]
     metrics_out             = PICARD_MARKDUPLICATES.out.metrics                 // channel: [ val(meta), [ metrics ] ]
-    samtools_index_out      = SAMTOOLS_INDEX_RECAL.out.bai                      // channel: [ val(meta), [ bai ] ]
-    baserecalibrator_out    = GATK4_BASERECALIBRATOR.out.table                  // channel: [ val(meta), [ table ] ]
+    // samtools_index_out      = SAMTOOLS_INDEX_RECAL.out.bai                      // channel: [ val(meta), [ bai ] ]
+    // baserecalibrator_out    = GATK4_BASERECALIBRATOR.out.table                  // channel: [ val(meta), [ table ] ]
     applybqsr_index_out     = GATK4_APPLYBQSR.out.bai
     applybqsr_out           = GATK4_APPLYBQSR.out.bam                           // channel: [ val(meta), [ bam ] ]
     ch_intervals_out        = ch_intervals
-    sortsam_dupesmarked_out = PICARD_SORTSAM_DUPLICATESMARKED.out.bam           // channel: [ val(meta), [ bam ] ]
+    // sortsam_dupesmarked_out = PICARD_SORTSAM_DUPLICATESMARKED.out.bam           // channel: [ val(meta), [ bam ] ]
 }
