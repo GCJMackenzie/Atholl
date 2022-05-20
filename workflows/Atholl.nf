@@ -252,7 +252,7 @@ if ( params.bwamem2_index == '' ) {
         println(dict)
         // println(sites)
         // println(sites_index)
-        println(bwaindex)
+        bwaindex.view()
     }
 
 }
