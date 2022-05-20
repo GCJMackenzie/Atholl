@@ -56,13 +56,13 @@ workflow GATK_TUMOR_ONLY_SOMATIC_VARIANT_CALLING {
 
     emit:
 
-    pileup_table        = GATK4_GETPILEUPSUMMARIES.out.table             // channel: [ val(meta), [ table ] ]
+    // pileup_table        = GATK4_GETPILEUPSUMMARIES.out.table             // channel: [ val(meta), [ table ] ]
 
-    contamination_table = GATK4_CALCULATECONTAMINATION.out.contamination // channel: [ val(meta), [ contamination ] ]
-    segmentation_table  = GATK4_CALCULATECONTAMINATION.out.segmentation  // channel: [ val(meta), [ segmentation ] ]
+    // contamination_table = GATK4_CALCULATECONTAMINATION.out.contamination // channel: [ val(meta), [ contamination ] ]
+    // segmentation_table  = GATK4_CALCULATECONTAMINATION.out.segmentation  // channel: [ val(meta), [ segmentation ] ]
 
-    filtered_vcf        = GATK4_FILTERMUTECTCALLS.out.vcf                // channel: [ val(meta), [ vcf ] ]
-    filtered_index      = GATK4_FILTERMUTECTCALLS.out.tbi                // channel: [ val(meta), [ tbi ] ]
+    // filtered_vcf        = GATK4_FILTERMUTECTCALLS.out.vcf                // channel: [ val(meta), [ vcf ] ]
+    // filtered_index      = GATK4_FILTERMUTECTCALLS.out.tbi                // channel: [ val(meta), [ tbi ] ]
     filtered_stats      = GATK4_FILTERMUTECTCALLS.out.stats              // channel: [ val(meta), [ stats ] ]
 
     renamed_vcf    = PICARD_RENAMESOMATICSAMPLEINVCF.out.vcf    // channel: [ val(meta), [ vcf ] ]
