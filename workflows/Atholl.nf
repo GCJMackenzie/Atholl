@@ -41,49 +41,6 @@ if ( params.bwamem2_index == '' ) {
     bwaindex = Channel.fromPath(params.bwamem2_index).collect()
     }
 
-    // resources_SNP             = [
-    //    [
-    //        file('gs://genomics-public-data/resources/broad/hg38/v0/hapmap_3.3.hg38.vcf.gz', checkIfExists: true),
-    //        file('gs://genomics-public-data/resources/broad/hg38/v0/1000G_omni2.5.hg38.vcf.gz', checkIfExists: true),
-    //        file('gs://genomics-public-data/resources/broad/hg38/v0/1000G_phase1.snps.high_confidence.hg38.vcf.gz', checkIfExists: true),
-    //        file('gs://genomics-public-data/resources/broad/hg38/v0/Homo_sapiens_assembly38.dbsnp138.vcf', checkIfExists: true)
-    //     ],
-    //     [
-    //        file('gs://genomics-public-data/resources/broad/hg38/v0/hapmap_3.3.hg38.vcf.gz.tbi', checkIfExists: true),
-    //        file('gs://genomics-public-data/resources/broad/hg38/v0/1000G_omni2.5.hg38.vcf.gz.tbi', checkIfExists: true),
-    //        file('gs://genomics-public-data/resources/broad/hg38/v0/1000G_phase1.snps.high_confidence.hg38.vcf.gz.tbi', checkIfExists: true),
-    //        file('gs://genomics-public-data/resources/broad/hg38/v0/Homo_sapiens_assembly38.dbsnp138.vcf.idx', checkIfExists: true)
-    //    ],
-    //    [
-    //        'hapmap,known=false,training=true,truth=true,prior=15.0 hapmap_3.3.hg38.vcf.gz',
-    //        'omni,known=false,training=true,truth=false,prior=12.0 1000G_omni2.5.hg38.vcf.gz',
-    //        '1000G,known=false,training=true,truth=false,prior=10.0 1000G_phase1.snps.high_confidence.hg38.vcf.gz',
-    //        'dbsnp,known=true,training=false,truth=false,prior=2.0 Homo_sapiens_assembly38.dbsnp138.vcf'
-    //    ]
-    // ]
-    
-    // resources_INDEL             = [
-    //    [
-    //       file('gs://genomics-public-data/resources/broad/hg38/v0/hapmap_3.3.hg38.vcf.gz', checkIfExists: true),
-    //       file('gs://genomics-public-data/resources/broad/hg38/v0/1000G_omni2.5.hg38.vcf.gz', checkIfExists: true),
-    //       file('gs://genomics-public-data/resources/broad/hg38/v0/Mills_and_1000G_gold_standard.indels.hg38.vcf.gz', checkIfExists: true),
-    //       file('gs://genomics-public-data/resources/broad/hg38/v0/Homo_sapiens_assembly38.known_indels.vcf.gz', checkIfExists: true)
-    //     ],
-    //     [
-    //        file('gs://genomics-public-data/resources/broad/hg38/v0/hapmap_3.3.hg38.vcf.gz.tbi', checkIfExists: true),
-    //        file('gs://genomics-public-data/resources/broad/hg38/v0/1000G_omni2.5.hg38.vcf.gz.tbi', checkIfExists: true),
-    //        file('gs://genomics-public-data/resources/broad/hg38/v0/Mills_and_1000G_gold_standard.indels.hg38.vcf.gz.tbi', checkIfExists: true),
-    //        file('gs://genomics-public-data/resources/broad/hg38/v0/Homo_sapiens_assembly38.known_indels.vcf.gz.tbi', checkIfExists: true)
-    //    ],
-    //   [
-    //        'hapmap,known=false,training=true,truth=true,prior=15.0 hapmap_3.3.hg38.vcf.gz',
-    //        'omni,known=false,training=true,truth=false,prior=12.0 1000G_omni2.5.hg38.vcf.gz',
-    //        '1000G,known=false,training=true,truth=false,prior=10.0 Mills_and_1000G_gold_standard.indels.hg38.vcf.gz',
-    //        'dbsnp,known=true,training=false,truth=false,prior=2.0 Homo_sapiens_assembly38.known_indels.vcf.gz'
-    //    ]
-    // ]
-    
-    
     //universal args: these args are used by every subworkflow, input arg is used for passing in sample specific data, some of the array entries included are
     //not necessary for everysubworkflow, e.g which_norm, these are only passed in to the subworkflows that require them.
     input           = file( params.input, checkIfExists: true)
