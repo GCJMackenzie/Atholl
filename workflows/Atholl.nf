@@ -54,6 +54,7 @@ if ( params.bwamem2_index == '' ) {
     start_calling = params.start_calling
     create_som_pon = params.create_som_pon
     joint_germline = params.joint_germline
+    vqsr           = params.vqsr
     tumor_somatic = params.tumor_somatic
     tumor_normal_somatic = params.tumor_normal_somatic
     paired = params.paired
@@ -177,6 +178,15 @@ if ( params.bwamem2_index == '' ) {
         ch_vqsr_in = GATK4_MERGEVCFS.out.vcf.combine(GATK4_MERGEVCFS.out.tbi, by: 0)
         ch_vqsr_in.view()
         GATK_VQSR(ch_vqsr_in, fasta, fai, dict, allelespecific , resources_SNP , resources_INDEL , annotation_SNP , annotation_INDEL , false , truthsensitivity)
+
+    }
+    
+    if (vqsr) {
+        println("Skipping to Variant Quality Score Recalibration step")
+
+        ch_vqsr_in = filetest.map{ meta, input, index, intervals, whichnorm -> [meta, input, index] }
+        ch_vqsr_in.view()
+        // GATK_VQSR(ch_vqsr_in, fasta, fai, dict, allelespecific , resources_SNP , resources_INDEL , annotation_SNP , annotation_INDEL , false , truthsensitivity)
 
     }
 
