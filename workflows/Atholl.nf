@@ -186,7 +186,7 @@ if ( params.bwamem2_index == '' ) {
 
         ch_vqsr_in = filetest.map{ meta, input, index, intervals, whichnorm -> [meta, input, index] }
         ch_vqsr_in.view()
-        // GATK_VQSR(ch_vqsr_in, fasta, fai, dict, allelespecific , resources_SNP , resources_INDEL , annotation_SNP , annotation_INDEL , false , truthsensitivity)
+        GATK_VQSR(ch_vqsr_in, fasta, fai, dict, allelespecific , resources_SNP , resources_INDEL , annotation_SNP , annotation_INDEL , false , truthsensitivity)
 
     }
 
