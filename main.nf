@@ -13,6 +13,7 @@ params.chunking              = false
 params.start_calling         = false
 params.create_som_pon        = false
 params.joint_germline        = false
+params.vqsr                  = false
 params.tumor_somatic         = false
 params.tumor_normal_somatic  = false
 
