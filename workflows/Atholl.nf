@@ -279,7 +279,7 @@ def extract_samples(csv_file, alignment, paired, chunking, start_calling, create
             filtered_normal = which_norms.unique().toList()
             return [the_meta, input_files, input_indexes, intervals, filtered_normal]
         } else {
-            return [the_meta, input_files, input_indexes, intervals, which_norms]
+            return [the_meta, input_files, input_indexes, intervals, which_norm]
         }
     }
 }
