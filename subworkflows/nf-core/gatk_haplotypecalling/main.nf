@@ -27,9 +27,11 @@ workflow GATK_HAPLOTYPECALLING {
 
     ch_versions = ch_versions.mix(GATK4_HAPLOTYPECALLER.out.versions.first())
 
+    // Sample renamed within the vcf file to match the sample ID
     PICARD_RENAMESAMPLEINVCF ( GATK4_HAPLOTYPECALLER.out.vcf )
     ch_versions = ch_versions.mix(PICARD_RENAMESAMPLEINVCF.out.versions)
 
+    // tbi file generated for renamed vcf file
     GATK4_INDEXFEATUREFILE ( PICARD_RENAMESAMPLEINVCF.out.vcf )
     ch_versions = ch_versions.mix(GATK4_INDEXFEATUREFILE.out.versions)
 

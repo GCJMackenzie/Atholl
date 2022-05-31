@@ -51,6 +51,7 @@ workflow GATK_TUMOR_ONLY_SOMATIC_VARIANT_CALLING {
     GATK4_FILTERMUTECTCALLS ( ch_filtermutect_in, fasta, fai, dict )
     ch_versions = ch_versions.mix(GATK4_FILTERMUTECTCALLS.out.versions)
 
+    // Sample name in filtered vcf file changed to match the sample ID
     PICARD_RENAMESOMATICSAMPLEINVCF ( GATK4_FILTERMUTECTCALLS.out.vcf )
     ch_versions = ch_versions.mix(PICARD_RENAMESOMATICSAMPLEINVCF.out.versions)
 

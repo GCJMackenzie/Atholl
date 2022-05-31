@@ -1,6 +1,5 @@
 //
-// Performs GATK best practice alignment and pre-processing of reads using BWA, GATK mergebamalignments (where necessary), markduplicates, sortsam, samtools index and BQSR.
-// BWA index created from fasta file if not already provided
+// Performs GATK best practice alignment  BWA, Picard sortsam, samtools index. For unaligned bam files: Samtools fastq and GATK mergebamalignments.
 //
 
 include { BWAMEM2_MEM                                       } from '../../../modules/bwamem2/mem/main.nf'
@@ -68,7 +67,7 @@ workflow GATK_ALIGN {
         ch_sortsam_in = BWAMEM2_MEM.out.bam
     } else {
         //
-        //If input is a fstaq file then align reads using bwamem2 mem
+        //If input is a fastq file then align reads using bwamem2 mem
         //
         BWAMEM2_MEM ( ch_input, bwaindex, false )
         ch_versions = ch_versions.mix(BWAMEM2_MEM.out.versions)
@@ -88,12 +87,6 @@ workflow GATK_ALIGN {
     SAMTOOLS_INDEX (ch_samindex_in)
     ch_versions = ch_versions.mix(SAMTOOLS_INDEX.out.versions)
     ch_bai = SAMTOOLS_INDEX.out.bai
-
-    //
-    //Perform first pass of BQSR using gatk baserecalibrator.
-    //
-    ch_baserecal_in = ch_samindex_in.combine(ch_bai, by: 0).combine(ch_intervals, by: 0)
-
 
     emit:
     versions                = ch_versions                                       // channel: [ versions.yml ]

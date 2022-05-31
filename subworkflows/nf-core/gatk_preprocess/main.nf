@@ -1,6 +1,5 @@
 //
-// Performs GATK best practice alignment and pre-processing of reads using BWA, GATK mergebamalignments (where necessary), markduplicates, sortsam, samtools index and BQSR.
-// BWA index created from fasta file if not already provided
+// Performs GATK best practice pre-processing of reads using markduplicates, sortsam, samtools index and BQSR.
 //
 
 include { GATK4_APPLYBQSR                                   } from '../../../modules/gatk4/applybqsr/main.nf'

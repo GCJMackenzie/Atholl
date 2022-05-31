@@ -1,8 +1,7 @@
 //
-// Run GATK mutect2, genomicsdbimport and createsomaticpanelofnormals
+// Run GATK genomicsdbimport and createsomaticpanelofnormals
 //
 
-include { GATK4_MUTECT2                     } from '../../../modules/gatk4/mutect2/main'
 include { GATK4_GENOMICSDBIMPORT            } from '../../../modules/gatk4/genomicsdbimport/main'
 include { GATK4_CREATESOMATICPANELOFNORMALS } from '../../../modules/gatk4/createsomaticpanelofnormals/main'
 

@@ -29,7 +29,6 @@ workflow GATK_JOINT_GERMLINE_VARIANT_CALLING {
     //
     //Joint genotyping performed using GenotypeGVCFs
     //
-    //[] is a placeholder for the input where the vcf tbi file would be passed in for non-genomicsdb workspace runs, which is not necessary for this workflow as it uses genomicsdb workspaces.
     genotype_input = GATK4_GENOMICSDBIMPORT.out.genomicsdb.combine(ch_joint_intervals, by: 0)
     GATK4_GENOTYPEGVCFS ( genotype_input, fasta, fai, dict, sites, sites_index)
 

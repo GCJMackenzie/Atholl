@@ -1,6 +1,5 @@
 //
-// Performs GATK best practice alignment and pre-processing of reads using BWA, GATK mergebamalignments (where necessary), markduplicates, sortsam, samtools index and BQSR.
-// BWA index created from fasta file if not already provided
+// Splits bam files into chunks using joint intervals file containing genomic intervals.
 //
 
 include { SAMTOOLS_VIEW } from '../../../modules/samtools/view/main.nf'
@@ -13,11 +12,10 @@ workflow SAMTOOLS_CHUNK {
 
     main:
     ch_versions = Channel.empty()
+    // joint intervals file read in and rows combined with the input channel.
     intervals_file = Channel.from(joint_intervals).splitCsv(sep: "\t")
-    // intervals_to_split = intervals_file.map{chrom, start, end, seconds, time -> ["${chrom}:${start}-${end}"]}
-    // intervals_to_name = intervals_file.map{chrom, start, end, seconds, time -> ["${chrom}_${start}_${end}"]}
     ch_added_ints = input.combine(intervals_file)
-    // .combine(intervals_to_name)
+    // rows from joint intervals file mapped to crate intervals values
     ch_input = ch_added_ints.map {
         meta, reads, indexes, chr, start, end, seconds, time ->
         def new_meta = meta.clone()
@@ -35,10 +33,11 @@ workflow SAMTOOLS_CHUNK {
     }
 
     //
-    //Index for sorted bam file made using samtools index
+    //Bam files split into chunks using samtools view
     //
     SAMTOOLS_VIEW (ch_input, [])
     ch_versions = ch_versions.mix(SAMTOOLS_VIEW.out.versions)
+    //chunked bams and their read group info sent to addorreplacereadgroups
     ch_picard_in = SAMTOOLS_VIEW.out.bam.map{meta, bam ->
     ID = "$meta.rgID"
     LB = "$meta.rgLB"

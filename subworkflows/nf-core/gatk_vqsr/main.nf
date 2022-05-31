@@ -29,6 +29,7 @@ workflow GATK_VQSR {
     ch_versions = Channel.empty()
     ch_select_variants_in = input
 
+    // SNPs separated from input vcf and sent through vqsr process in SNP mode
     GATK4_SELECTVARIANTS_SNP (ch_select_variants_in)
     ch_versions   = ch_versions.mix(GATK4_SELECTVARIANTS_SNP.out.versions)
 
@@ -43,6 +44,7 @@ workflow GATK_VQSR {
     GATK4_APPLYVQSR_SNP ( ch_snp_vqsr_in, fasta, fai, dict, allelespecific, truthsensitivity, 'SNP' )
     ch_versions   = ch_versions.mix(GATK4_APPLYVQSR_SNP.out.versions)
 
+    // INDELs separated from input vcf and sent through vqsr process in INDEL mode
     GATK4_SELECTVARIANTS_INDEL (ch_select_variants_in)
 
     ch_vrecal_indel_in = GATK4_SELECTVARIANTS_INDEL.out.vcf.combine(GATK4_SELECTVARIANTS_INDEL.out.tbi, by: 0)
@@ -54,8 +56,10 @@ workflow GATK_VQSR {
     ch_indel_vqsr_in    = ch_vrecal_indel_in.combine(ch_indel_recal, by: 0).combine(ch_indel_idx, by: 0).combine(ch_indel_tranches, by: 0)
     GATK4_APPLYVQSR_INDEL ( ch_indel_vqsr_in, fasta, fai, dict, allelespecific, truthsensitivity, 'INDEL' )
 
+    // Other variants separated from input vcf
     GATK4_SELECTVARIANTS_NORECAL (ch_select_variants_in)
 
+    // Recalibrated SNPs and INDELs re-merged with other variants into final file
     ch_merge_recal_in = GATK4_SELECTVARIANTS_NORECAL.out.vcf.mix(GATK4_APPLYVQSR_SNP.out.vcf).mix(GATK4_APPLYVQSR_INDEL.out.vcf).groupTuple(by: 0)
     GATK4_MERGEVCFS_RECALIBRATED(ch_merge_recal_in, dict, true)
 
