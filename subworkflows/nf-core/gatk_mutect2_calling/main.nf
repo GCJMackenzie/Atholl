@@ -49,6 +49,6 @@ workflow GATK_MUTECT2_CALLING {
     mutect2_tbi   = create_sompon ? GATK4_MUTECT2_SOMPON.out.tbi : GATK4_MUTECT2.out.tbi                      // channel: [ val(meta), [ tbi ] ]
     mutect2_stats = create_sompon ? GATK4_MUTECT2_SOMPON.out.stats : GATK4_MUTECT2.out.stats                    // channel: [ val(meta), [ stats ] ]
     mutect2_intervals = ch_intervals
-    mutect2_f1r2  = tumor_normal ? GATK4_MUTECT2.out.f1r2 : [] // channel: [ val(meta), [ f1r2 ] ]
+    mutect2_f1r2  = GATK4_MUTECT2.out.f1r2 // channel: [ val(meta), [ f1r2 ] ]
     versions      = ch_versions                                // channel: [ versions.yml ]
 }

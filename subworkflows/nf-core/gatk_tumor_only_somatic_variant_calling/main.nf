@@ -5,16 +5,18 @@
 include { GATK4_GETPILEUPSUMMARIES     } from '../../../modules/gatk4/getpileupsummaries/main'
 include { GATK4_CALCULATECONTAMINATION } from '../../../modules/gatk4/calculatecontamination/main'
 include { GATK4_FILTERMUTECTCALLS      } from '../../../modules/gatk4/filtermutectcalls/main'
+include { GATK4_LEARNREADORIENTATIONMODEL      } from '../../../modules/gatk4/learnreadorientationmodel/main'
 include { PICARD_RENAMESAMPLEINVCF as PICARD_RENAMESOMATICSAMPLEINVCF} from '../../../modules/picard/renamesampleinvcf/main'
 
 workflow GATK_TUMOR_ONLY_SOMATIC_VARIANT_CALLING {
     take:
-    input                 // channel: [ val(meta), bam, bai, [ vcf ], [ tbi ], [stats] , intervals ]
+    input                 // channel: [ val(meta), bam, bai, [ vcf ], [ tbi ], [stats] , intervals, [f1r2] ]
     fasta                 // channel: /path/to/reference/fasta
     fai                   // channel: /path/to/reference/fasta/index
     dict                  // channel: /path/to/reference/fasta/dictionary
     germline_resource     // channel: /path/to/germline/resource
     germline_resource_tbi // channel: /path/to/germline/index
+    use_f1r2
 
 
     main:
@@ -24,9 +26,13 @@ workflow GATK_TUMOR_ONLY_SOMATIC_VARIANT_CALLING {
     // Generate pileup summary table using getepileupsummaries.
     //
     pileup_input = input.map {
-         meta, bam, bai, input_file, input_index, stats, intervals ->
+         meta, bam, bai, input_file, input_index, stats, intervals, f1r2 ->
          [meta, bam, bai, intervals]
      }
+    vcf_input = input.map {
+        meta, bam, bai, input_file, input_index, stats, intervals, f1r2 ->
+        [meta, bam, bai, input_file, input_index, stats, intervals]
+    }
     GATK4_GETPILEUPSUMMARIES ( pileup_input , germline_resource , germline_resource_tbi )
     ch_versions = ch_versions.mix(GATK4_GETPILEUPSUMMARIES.out.versions)
 
@@ -41,12 +47,27 @@ workflow GATK_TUMOR_ONLY_SOMATIC_VARIANT_CALLING {
     //
     // Mutect2 calls filtered by filtermutectcalls using the contamination and segmentation tables.
     //
-    ch_vcf = input
+    ch_vcf = vcf_input
     ch_segment       = GATK4_CALCULATECONTAMINATION.out.segmentation
     ch_contamination = GATK4_CALCULATECONTAMINATION.out.contamination
-    ch_filter_results = ch_vcf.combine(ch_segment, by: 0).combine(ch_contamination, by: 0)
-    ch_filtermutect_in = ch_filter_results.map{meta, bam, bai, vcf, tbi, stats, intervals, segment, contamination ->
-         [meta, vcf, tbi, stats, intervals, [], segment, contamination, []]}
+    if (use_f1r2) {
+        ch_learnread_in = input.map {
+            meta, bam, bai, input_file, input_index, stats, intervals, f1r2 ->
+            [meta, f1r2]
+        }
+        GATK4_LEARNREADORIENTATIONMODEL (ch_learnread_in)
+        ch_versions = ch_versions.mix(GATK4_LEARNREADORIENTATIONMODEL.out.versions)
+        ch_filter_results = ch_vcf.combine(ch_segment, by: 0).combine(ch_contamination, by: 0).combine(GATK4_LEARNREADORIENTATIONMODEL.out.artifactprior, by: 0)
+        ch_filtermutect_in = ch_filter_results.map{meta, bam, bai, vcf, tbi, stats, intervals, segment, contamination, artifactprior ->
+             [meta, vcf, tbi, stats, intervals, artifactprior, segment, contamination, []]}
+    } else {
+        ch_filter_results = ch_vcf.combine(ch_segment, by: 0).combine(ch_contamination, by: 0)
+        ch_filtermutect_in = ch_filter_results.map{meta, bam, bai, vcf, tbi, stats, intervals, segment, contamination ->
+             [meta, vcf, tbi, stats, intervals, [], segment, contamination, []]}
+
+    }
+
+
      ch_filtermutect_in.view()
     GATK4_FILTERMUTECTCALLS ( ch_filtermutect_in, fasta, fai, dict )
     ch_versions = ch_versions.mix(GATK4_FILTERMUTECTCALLS.out.versions)
@@ -61,6 +82,8 @@ workflow GATK_TUMOR_ONLY_SOMATIC_VARIANT_CALLING {
 
     // contamination_table = GATK4_CALCULATECONTAMINATION.out.contamination // channel: [ val(meta), [ contamination ] ]
     // segmentation_table  = GATK4_CALCULATECONTAMINATION.out.segmentation  // channel: [ val(meta), [ segmentation ] ]
+
+    // artifact_priors     = GATK4_LEARNREADORIENTATIONMODEL.out.artifactprior.collect() // channel: [ val(meta), [ artifactprior ] ]
 
     // filtered_vcf        = GATK4_FILTERMUTECTCALLS.out.vcf                // channel: [ val(meta), [ vcf ] ]
     // filtered_index      = GATK4_FILTERMUTECTCALLS.out.tbi                // channel: [ val(meta), [ tbi ] ]
