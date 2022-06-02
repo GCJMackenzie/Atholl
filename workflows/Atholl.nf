@@ -51,23 +51,24 @@ if ( params.bwamem2_index == '' ) {
 
     //entry params: used to control which subworkflow(s) are run
     // run alignment and preprocessing steps
-    alignment = params.alignment
+    alignment = params.run_alignment
     // save aligned and preprocessed bams by merging the chunked files back into full samples. Workflow will continue to next steps
-    checkpoint = params.checkpoint
+    checkpoint = params.save_checkpoint
     // skip alignment step and chunk input file for preprocessing
-    chunking = params.chunking
+    chunking = params.start_at_chunking
     // skip alignment and preprocessing, chunk input file ready for variant calling / create_som_pon
-    start_calling = params.start_calling
+    start_calling = params.start_at_calling
     // run somatic panel of normal steps
-    create_som_pon = params.create_som_pon
+    create_som_pon = params.run_create_som_pon
     // run joint germline steps
-    joint_germline = params.joint_germline
+    joint_germline = params.run_joint_germline
     // skip directly to vqsr step, assumes input file is a joint germline vcf
-    vqsr           = params.vqsr
+    vqsr           = params.start_at_vqsr
     // run somatic variant calling with just tumor samples
-    tumor_somatic = params.tumor_somatic
+    tumor_somatic = params.run_tumor_somatic
     // run somatic variant calling with tumor normal paired samples
-    tumor_normal_somatic = params.tumor_normal_somatic
+    tumor_normal_somatic = params.run_tumor_normal_somatic
+    
     // fastq file inputs are paired if true
     paired = params.paired
 
