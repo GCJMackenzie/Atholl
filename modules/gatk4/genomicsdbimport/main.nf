@@ -29,7 +29,8 @@ process GATK4_GENOMICSDBIMPORT {
     // settings for running default create gendb mode
     inputs_command = input_map ? "--sample-name-map ${vcf[0]}" : "${'-V ' + vcf.join(' -V ')}"
     dir_command = "--genomicsdb-workspace-path ${prefix}"
-    intervals_command = intervalfile ? " -L ${intervalfile} " : " -L ${intervalval} "
+    // intervals_command = intervalfile ? " -L ${intervalfile} " : " -L ${intervalval} "
+    intervals_command = ''
 
     // settings changed for running get intervals list mode if run_intlist is true
     if (run_intlist) {
