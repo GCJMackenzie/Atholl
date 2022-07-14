@@ -142,7 +142,7 @@ if ( params.bwamem2_index == '' ) {
         GATK_MUTECT2_CALLING(ch_mutect2_sub_in, false, false, true, fasta, fai, dict, [], [], [], [])
         ch_som_pon_vcf =  GATK_MUTECT2_CALLING.out.mutect2_vcf.collect{it[1]}.toList()
         ch__som_pon_index =  GATK_MUTECT2_CALLING.out.mutect2_tbi.collect{it[1]}.toList()
-        ch_som_pon_in = Channel.of([[ id:joint_id ]]).combine(ch_som_pon_vcf).combine(ch__som_pon_index).combine([joint_intervals]).combine(['']).combine([dict])
+        ch_som_pon_in = Channel.of([[ id:joint_id ]]).combine(ch_som_pon_vcf).combine(ch__som_pon_index).combine(['']).combine(['']).combine([dict])
         // vcf chunks merged using genomicsdbimport then createsomaticpanelofnormals makes the panel of normals
         GATK_CREATE_SOMATIC_PON(  ch_som_pon_in , fasta , fai , dict , joint_id, joint_intervals )
     }
